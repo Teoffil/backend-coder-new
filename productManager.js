@@ -1,22 +1,29 @@
+
+const fs = require('fs');
+
 class ProductManager {
-    constructor() {
-        this.products = [];
-        this.nextId = 1; // Para el id autoincrementable
+    constructor(filePath) {
+        this.path = filePath;
+        this.products = this.loadProducts() || [];
+        this.nextId = this.products.length > 0 ? Math.max(...this.products.map(p => p.id), 0) + 1 : 1;
     }
 
-    // Método para añadir un producto
-    addProduct(title, description, price, thumbnail, code, stock) {
-        // Verificación de que todos los campos son proporcionados
-        if (!title || !description || !price || !thumbnail || !code || !stock) {
-            throw new Error("Todos los campos son obligatorios");
+    // Load products from the file
+    loadProducts() {
+        if (fs.existsSync(this.path)) {
+            return JSON.parse(fs.readFileSync(this.path));
         }
+        return [];
+    }
 
-        // Verificación de que el código del producto no se repita
-        if (this.products.some(product => product.code === code)) {
-            throw new Error("El código del producto ya existe");
-        }
+    // Save products to the file
+    saveProducts() {
+        fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2));
+    }
 
-        const newProduct = {
+    // Method to add a product
+    addProduct({ title, description, price, thumbnail, code, stock }) {
+        const product = {
             id: this.nextId++,
             title,
             description,
@@ -25,30 +32,42 @@ class ProductManager {
             code,
             stock
         };
-
-        this.products.push(newProduct);
+        this.products.push(product);
+        this.saveProducts();
+        return product;
     }
 
-    // Método para obtener todos los productos
+    // Method to get all products
     getProducts() {
         return this.products;
     }
 
-    // Método para obtener un producto por su ID
+    // Method to get a product by id
     getProductById(id) {
-        const product = this.products.find(product => product.id === id);
-        if (!product) {
-            console.error("Not found");
+        return this.products.find(p => p.id === id);
+    }
+
+    // Method to update a product
+    updateProduct(id, updatedProduct) {
+        const index = this.products.findIndex(p => p.id === id);
+        if (index === -1) {
             return null;
         }
-        return product;
+        this.products[index] = { ...this.products[index], ...updatedProduct };
+        this.saveProducts();
+        return this.products[index];
+    }
+
+    // Method to delete a product
+    deleteProduct(id) {
+        const index = this.products.findIndex(p => p.id === id);
+        if (index === -1) {
+            return false;
+        }
+        this.products.splice(index, 1);
+        this.saveProducts();
+        return true;
     }
 }
-
-// Ejemplo de uso:
-const manager = new ProductManager();
-manager.addProduct("Producto 1", "Descripción del producto 1", 100, "/img/prod1.jpg", "code123", 10);
-console.log(manager.getProducts()); // Muestra los productos
-console.log(manager.getProductById(1)); // Muestra el producto con id 1
 
 module.exports = ProductManager;
