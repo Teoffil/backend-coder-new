@@ -38,6 +38,23 @@ async function testProductManager() {
     console.log('\nTest 6: deleteProduct');
     manager.deleteProduct(addedProduct.id);
     console.log(manager.getProducts());
+
+    // Test 7: Intentar agregar un producto con título vacío
+    console.log('\nTest 7: Agregar un producto con título vacío');
+    try {
+        manager.addProduct({ title: "", description: "desc", price: 100, thumbnail: "url", code: "123", stock: 10 });
+    } catch (error) {
+        console.log('Error esperado:', error.message);
+    }
+
+    // Test 8: Intentar agregar un producto con stock no válido
+    console.log('\nTest 8: Agregar un producto con stock no válido');
+    try {
+        manager.addProduct({ title: "Producto", description: "desc", price: 100, thumbnail: "url", code: "123", stock: -5 });
+    } catch (error) {
+        console.log('Error esperado:', error.message);
+    }
 }
 
 testProductManager().catch(console.error);
+

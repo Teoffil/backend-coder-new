@@ -23,6 +23,14 @@ class ProductManager {
 
     // Method to add a product
     addProduct({ title, description, price, thumbnail, code, stock }) {
+        // Validaciones
+        if (typeof stock !== 'number' || !Number.isInteger(stock) || stock < 0) {
+            throw new Error('El stock debe ser un número entero positivo.');
+    }
+
+        if (typeof title !== 'string' || title.length === 0) {
+            throw new Error('El título no debe estar vacío.');
+        }
         const product = {
             id: this.nextId++,
             title,
