@@ -1,4 +1,4 @@
-const ProductManager = require('./productManager');
+const ProductManager = require('./src/productManager');
 
 async function testProductManager() {
     // Crear una instancia de ProductManager

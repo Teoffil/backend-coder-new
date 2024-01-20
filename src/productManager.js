@@ -1,36 +1,48 @@
-
-const fs = require('fs');
+const fs = require('fs').promises;
 
 class ProductManager {
     constructor(filePath) {
         this.path = filePath;
-        this.products = this.loadProducts() || [];
-        this.nextId = this.products.length > 0 ? Math.max(...this.products.map(p => p.id), 0) + 1 : 1;
+        this.init();
     }
 
-    // Load products from the file
-    loadProducts() {
-        if (fs.existsSync(this.path)) {
-            return JSON.parse(fs.readFileSync(this.path));
+    async init() {
+        try {
+            this.products = await this.loadProducts();
+            this.nextId = this.products.length > 0 ? Math.max(...this.products.map(p => p.id)) + 1 : 1;
+        } catch (error) {
+            this.products = [];
+            this.nextId = 1;
         }
-        return [];
     }
 
-    // Save products to the file
-    saveProducts() {
-        fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2));
+    async loadProducts() {
+        try {
+            const data = await fs.readFile(this.path, 'utf8');
+            return JSON.parse(data);
+        } catch (error) {
+            throw new Error('Error al cargar productos: ' + error.message);
+        }
     }
 
-    // Method to add a product
-    addProduct({ title, description, price, thumbnail, code, stock }) {
+    async saveProducts() {
+        try {
+            await fs.writeFile(this.path, JSON.stringify(this.products, null, 2));
+        } catch (error) {
+            throw new Error('Error al guardar productos: ' + error.message);
+        }
+    }
+
+    async addProduct({ title, description, price, thumbnail, code, stock }) {
         // Validaciones
         if (typeof stock !== 'number' || !Number.isInteger(stock) || stock < 0) {
             throw new Error('El stock debe ser un número entero positivo.');
-    }
+        }
 
         if (typeof title !== 'string' || title.length === 0) {
             throw new Error('El título no debe estar vacío.');
         }
+        
         const product = {
             id: this.nextId++,
             title,
@@ -40,40 +52,39 @@ class ProductManager {
             code,
             stock
         };
+
         this.products.push(product);
-        this.saveProducts();
+        await this.saveProducts();
         return product;
     }
 
-    // Method to get all products
     getProducts() {
         return this.products;
     }
 
-    // Method to get a product by id
     getProductById(id) {
         return this.products.find(p => p.id === id);
     }
 
-    // Method to update a product
-    updateProduct(id, updatedProduct) {
+    async updateProduct(id, updatedProduct) {
         const index = this.products.findIndex(p => p.id === id);
         if (index === -1) {
             return null;
         }
+
         this.products[index] = { ...this.products[index], ...updatedProduct };
-        this.saveProducts();
+        await this.saveProducts();
         return this.products[index];
     }
 
-    // Method to delete a product
-    deleteProduct(id) {
+    async deleteProduct(id) {
         const index = this.products.findIndex(p => p.id === id);
         if (index === -1) {
             return false;
         }
+
         this.products.splice(index, 1);
-        this.saveProducts();
+        await this.saveProducts();
         return true;
     }
 }

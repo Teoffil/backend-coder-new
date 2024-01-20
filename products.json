@@ -1,1 +1,12 @@
-[]
+[
+    {"id": 1, "title": "Laptop Gamer", "description": "Laptop de alta gama para juegos", "price": 1200.99, "thumbnail": "laptop_gamer.jpg", "code": "LTG001", "stock": 10},
+    {"id": 2, "title": "Mouse Inalámbrico", "description": "Mouse ergonómico y recargable", "price": 25.50, "thumbnail": "mouse_wireless.jpg", "code": "MI002", "stock": 30},
+    {"id": 3, "title": "Teclado Mecánico", "description": "Teclado mecánico retroiluminado", "price": 70.00, "thumbnail": "keyboard_mechanical.jpg", "code": "TM003", "stock": 20},
+    {"id": 4, "title": "Monitor 4K", "description": "Monitor 4K Ultra HD de 27 pulgadas", "price": 330.99, "thumbnail": "monitor_4k.jpg", "code": "M4K004", "stock": 15},
+    {"id": 5, "title": "Disco Duro Externo", "description": "Disco duro externo de 1TB", "price": 80.00, "thumbnail": "hard_drive_external.jpg", "code": "DDE005", "stock": 25},
+    {"id": 6, "title": "Router Inalámbrico", "description": "Router Wi-Fi de alta velocidad", "price": 60.00, "thumbnail": "router_wireless.jpg", "code": "RI006", "stock": 12},
+    {"id": 7, "title": "Tarjeta Gráfica", "description": "Tarjeta gráfica de alto rendimiento", "price": 400.00, "thumbnail": "graphics_card.jpg", "code": "TG007", "stock": 8},
+    {"id": 8, "title": "Auriculares Bluetooth", "description": "Auriculares inalámbricos con cancelación de ruido", "price": 150.00, "thumbnail": "headphones_bluetooth.jpg", "code": "AB008", "stock": 20},
+    {"id": 9, "title": "Webcam HD", "description": "Webcam de alta definición para conferencias", "price": 45.00, "thumbnail": "webcam_hd.jpg", "code": "WH009", "stock": 18},
+    {"id": 10, "title": "Impresora 3D", "description": "Impresora 3D para uso doméstico y profesional", "price": 350.00, "thumbnail": "printer_3d.jpg", "code": "I3D010", "stock": 5}
+]
