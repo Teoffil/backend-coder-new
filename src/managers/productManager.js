@@ -3,19 +3,22 @@ const fs = require('fs').promises;
 class ProductManager {
     constructor(filePath) {
         this.path = filePath;
-        this.init();
+        this.products = [];
+        this.nextId = 1;
+        this.init(); // Inicia la carga de productos
     }
 
     async init() {
         try {
-            this.products = await this.loadProducts();
+            const productsLoaded = await this.loadProducts();
+            this.products = productsLoaded;
             this.nextId = this.products.length > 0 ? Math.max(...this.products.map(p => p.id)) + 1 : 1;
         } catch (error) {
-            this.products = [];
-            this.nextId = 1;
+            console.error('Error al inicializar ProductManager:', error.message);
+            // Considera si quieres manejar este error de otra manera
         }
     }
-
+    
     async loadProducts() {
         try {
             const data = await fs.readFile(this.path, 'utf8');
