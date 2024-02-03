@@ -90,8 +90,12 @@
     "stock": 5
   },
   {
-    "name": "Azucar mascabo",
-    "price": "3424",
+    "title": "Prueba de producto",
+    "description": "son caramelos para gente comun",
+    "price": "424",
+    "thumbnail": "x",
+    "code": "342",
+    "stock": "2",
     "id": 11
   }
 ]

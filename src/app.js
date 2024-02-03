@@ -86,11 +86,19 @@ io.on('connection', (socket) => {
     });
 
     // Manejar el evento 'addProduct'
-    socket.on('addProduct', async (newProduct) => {
+    socket.on('addProduct', async (newProductData) => {
         try {
             const products = await readProductsFromFile();
-            newProduct.id = products.length + 1; // Asignar un nuevo ID basado en la longitud
-            products.push(newProduct);
+            // Calcular el nuevo ID
+            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+            
+            // Crear un nuevo objeto de producto con el ID como la primera propiedad
+            const newProduct = {
+                id: newId,
+                ...newProductData
+            };
+
+            products.push(newProduct); // Añade el nuevo producto con el ID al principio
             await writeProductsToFile(products);
             io.emit('updateProducts', products); // Emitir a todos los clientes
         } catch (error) {
