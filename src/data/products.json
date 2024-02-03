@@ -88,5 +88,10 @@
     "thumbnail": "printer_3d.jpg",
     "code": "I3D010",
     "stock": 5
+  },
+  {
+    "name": "Azucar mascabo",
+    "price": "3424",
+    "id": 11
   }
 ]
