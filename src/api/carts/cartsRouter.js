@@ -1,8 +1,9 @@
 const express = require('express');
-const CartManager = require('../../dao/mongo/cartManager');
+const CartManager = require('../../dao/mongo/CartManager'); // Asegúrate de que la ruta es correcta
 const router = express.Router();
-const path = require('path');
-const cartManager = new CartManager(path.join(__dirname, '..', '..', 'data', 'carts.json'));
+
+// No necesitas el path.join(__dirname, '..', '..', 'data', 'carts.json') para CartManager en MongoDB
+const cartManager = new CartManager();
 
 // Crear un nuevo carrito
 router.post('/', async (req, res) => {
@@ -17,7 +18,8 @@ router.post('/', async (req, res) => {
 // Listar productos en un carrito específico
 router.get('/:cid', async (req, res) => {
     try {
-        const cart = await cartManager.getCartById(parseInt(req.params.cid, 10));
+        // Aquí asumimos que getCartById usa el _id de MongoDB, no parseInt
+        const cart = await cartManager.getCartById(req.params.cid);
         if (cart) {
             res.json(cart.products);
         } else {
@@ -29,9 +31,11 @@ router.get('/:cid', async (req, res) => {
 });
 
 // Agregar un producto al carrito
-router.post('/:cid/product/:pid', async (req, res) => {
+// Se ajustó la ruta para coincidir con tu solicitud POST: '/:cid/products'
+router.post('/:cid/products', async (req, res) => {
     try {
-        const updatedCart = await cartManager.addProductToCart(parseInt(req.params.cid, 10), parseInt(req.params.pid, 10));
+        // Asumiendo que addProductToCart espera el _id del carrito y el objeto del producto con su _id y cantidad
+        const updatedCart = await cartManager.addProductToCart(req.params.cid, req.body.productId, req.body.quantity);
         res.json(updatedCart);
     } catch (error) {
         res.status(500).send(error.message);
