@@ -1,15 +1,15 @@
 const express = require('express');
-const ProductManager = require('../../managers/productManager'); // Asegúrate de que la ruta sea correcta
+const ProductManager = require('../../dao/mongo/productManager');
 const router = express.Router();
-const path = require('path');
-const filePath = path.join(__dirname, '../../data/products.json');
-const productManager = new ProductManager(filePath);
+
+const productManager = new ProductManager();
+
 
 // Listar todos los productos
 router.get('/', async (req, res) => {
     try {
         const limit = parseInt(req.query.limit, 10);
-        const products = await productManager.getProducts();
+        const products = await productManager.getAllProducts(); // Corrección aquí
         res.json(limit ? products.slice(0, limit) : products);
     } catch (error) {
         res.status(500).send(error.message);

@@ -1,5 +1,5 @@
 const express = require('express');
-const CartManager = require('../../managers/cartManager'); // Asegúrate de que la ruta sea correcta
+const CartManager = require('../../dao/mongo/cartManager');
 const router = express.Router();
 const path = require('path');
 const cartManager = new CartManager(path.join(__dirname, '..', '..', 'data', 'carts.json'));

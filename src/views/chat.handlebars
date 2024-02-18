@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Ecommerce</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const socket = io();
+
+            document.getElementById('chatForm').addEventListener('submit', function(e) {
+                e.preventDefault(); // Previene el envío tradicional del formulario
+
+                const user = document.getElementById('user').value;
+                const message = document.getElementById('message').value;
+
+                socket.emit('newMessage', { user, message }); // Emite el nuevo mensaje al servidor
+
+                document.getElementById('message').value = '';
+                return false;
+            });
+
+            socket.on('updateMessages', function(messages) {
+                const messagesContainer = document.getElementById('messages');
+                messagesContainer.innerHTML = ''; // Limpia los mensajes anteriores
+                messages.forEach(msg => {
+                    const messageElement = document.createElement('div');
+                    messageElement.innerText = `${msg.user}: ${msg.message}`;
+                    messagesContainer.appendChild(messageElement);
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h2>Chat en Vivo</h2>
+    <div id="messages" style="border: 1px solid #ccc; height: 200px; overflow: auto;"></div>
+    <form id="chatForm">
+        <input type="text" id="user" placeholder="Tu correo" required />
+        <input type="text" id="message" placeholder="Escribe un mensaje" required />
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>
