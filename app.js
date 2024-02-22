@@ -36,6 +36,11 @@ app.get('/chat', (req, res) => {
     res.render('chat');
 });
 
+// Ruta para la página de inicio
+app.get('/', (req, res) => {
+    res.render('home'); // Renderiza 'home.handlebars' en la ruta raíz.
+});
+
 // Configuración de Socket.io para manejar la conexión y los eventos de chat
 io.on('connection', (socket) => {
     console.log('Un usuario se ha conectado al chat.');
