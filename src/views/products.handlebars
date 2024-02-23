@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Productos</title>
+</head>
+<body>
+    <h1>Productos</h1>
+    <ul>
+        {{#each products}}
+            <li>
+                <h2>{{this.title}}</h2>
+                <p>{{this.description}}</p>
+                <p>Precio: ${{this.price}}</p>
+                <!-- Opción para agregar al carrito -->
+                <button onclick="addToCart('{{this._id}}')">Agregar al Carrito</button>
+                <!-- Opción para ver detalles -->
+                <button onclick="location.href='/products/{{this._id}}'">Ver Detalles</button>
+            </li>
+        {{/each}}
+    </ul>
+    <!-- Botón para ver el carrito -->
+    <a href="/carts/{{cartId}}">Ver Carrito</a>
+    <!-- Paginación -->
+    {{#if prevPage}}
+        <button onclick="location.href='/products?page={{prevPage}}'">Anterior</button>
+    {{/if}}
+    {{#if nextPage}}
+        <button onclick="location.href='/products?page={{nextPage}}'">Siguiente</button>
+    {{/if}}
+    <script>
+        function addToCart(productId) {
+            // Utiliza la variable cartId que se pasa a la plantilla
+            const cartId = '{{cartId}}'; // Asegúrate de que cartId se pase al renderizar la plantilla
+            fetch(`/api/carts/${cartId}/products`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId: productId, quantity: 1 }) // Asumiendo que se agrega 1 unidad
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    alert('Producto agregado al carrito');
+                } else {
+                    alert('Error al agregar el producto');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+</body>
+</html>

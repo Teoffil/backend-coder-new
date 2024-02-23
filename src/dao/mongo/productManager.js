@@ -1,39 +1,60 @@
 const Product = require('../models/ProductSchema');
+const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
+
+Product.schema.plugin(mongoosePaginate);
 
 class ProductManager {
-    constructor() {}
-
-    // Método para agregar un nuevo producto
     async addProduct(productData) {
         const product = new Product(productData);
         await product.save();
         return product;
     }
 
-    // Método para obtener todos los productos
-    async getAllProducts() {
-        const products = await Product.find();
-        return products;
+    async getProducts({ limit = 10, page = 1, sort = '', query = '' }) {
+        const options = {
+            page: parseInt(page, 10),
+            limit: parseInt(limit, 10),
+            sort: sort ? { price: sort === 'asc' ? 1 : -1 } : {},
+        };
+        let queryFilter = {};
+        try {
+            queryFilter = query ? JSON.parse(query) : {};
+            // Extender el filtrado aquí
+            if (queryFilter.categoria) {
+                queryFilter['categoria'] = queryFilter.categoria;
+            }
+            if (queryFilter.disponibilidad) {
+                queryFilter['stock'] = { $gt: 0 };
+            }
+        } catch (error) {
+            console.error("Error parsing query string to JSON", error);
+        }
+        
+        const result = await Product.paginate(queryFilter, options);
+        return {
+            docs: result.docs,
+            totalPages: result.totalPages,
+            page: result.page,
+            hasNextPage: result.hasNextPage,
+            hasPrevPage: result.hasPrevPage,
+            nextPage: result.nextPage,
+            prevPage: result.prevPage
+        };
     }
 
-    // Método para obtener un producto por su ID
     async getProductById(productId) {
-        const product = await Product.findById(productId);
-        return product;
+        return await Product.findById(productId);
     }
 
-    // Método para actualizar un producto por su ID
     async updateProduct(productId, productData) {
-        const updatedProduct = await Product.findByIdAndUpdate(productId, productData, { new: true });
-        return updatedProduct;
+        return await Product.findByIdAndUpdate(productId, productData, { new: true });
     }
 
-    // Método para eliminar un producto por su ID
     async deleteProduct(productId) {
         await Product.findByIdAndDelete(productId);
         return { message: 'Producto eliminado correctamente' };
     }
 }
 
-module.exports = ProductManager;
-
+module.exports = new ProductManager();

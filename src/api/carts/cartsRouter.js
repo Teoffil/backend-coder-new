@@ -1,45 +1,80 @@
 const express = require('express');
-const CartManager = require('../../dao/mongo/CartManager'); // Asegúrate de que la ruta es correcta
+const CartManager = require('../../dao/mongo/cartManager'); // Asegúrate de que la ruta sea correcta
 const router = express.Router();
+const mongoose = require('mongoose');
 
-// No necesitas el path.join(__dirname, '..', '..', 'data', 'carts.json') para CartManager en MongoDB
 const cartManager = new CartManager();
 
 // Crear un nuevo carrito
 router.post('/', async (req, res) => {
     try {
+        console.log('Creando un nuevo carrito...'); // Agrega esto para depuración
         const newCart = await cartManager.createCart();
+        res.cookie('cartId', newCart._id.toString());
         res.status(201).json(newCart);
     } catch (error) {
         res.status(500).send(error.message);
     }
 });
 
+
 // Listar productos en un carrito específico
 router.get('/:cid', async (req, res) => {
+    const cartId = req.params.cid;
+
+    // Verificar si cartId es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(cartId)) {
+        return res.status(400).send('ID de carrito no válido');
+    }
+
     try {
-        // Aquí asumimos que getCartById usa el _id de MongoDB, no parseInt
-        const cart = await cartManager.getCartById(req.params.cid);
-        if (cart) {
-            res.json(cart.products);
-        } else {
-            res.status(404).send('Carrito no encontrado');
-        }
+        const cart = await cartManager.getCartById(cartId);
+        res.render('cartDetails', { cart }); // Asegúrate de tener la vista cartDetails.handlebars
     } catch (error) {
         res.status(500).send(error.message);
     }
 });
 
 // Agregar un producto al carrito
-// Se ajustó la ruta para coincidir con tu solicitud POST: '/:cid/products'
 router.post('/:cid/products', async (req, res) => {
     try {
-        // Asumiendo que addProductToCart espera el _id del carrito y el objeto del producto con su _id y cantidad
         const updatedCart = await cartManager.addProductToCart(req.params.cid, req.body.productId, req.body.quantity);
         res.json(updatedCart);
     } catch (error) {
         res.status(500).send(error.message);
     }
 });
+
+// Eliminar un producto específico del carrito
+router.delete('/:cid/products/:pid', async (req, res) => {
+    try {
+        const cart = await cartManager.removeProductFromCart(req.params.cid, req.params.pid);
+        res.json(cart);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+// Actualizar el carrito con un arreglo de productos
+router.put('/:cid', async (req, res) => {
+    try {
+        const updatedCart = await cartManager.updateCartProducts(req.params.cid, req.body.products);
+        res.json(updatedCart);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+// Vaciar el carrito (eliminar todos los productos)
+router.delete('/:cid', async (req, res) => {
+    try {
+        const cart = await cartManager.emptyCart(req.params.cid);
+        res.json(cart);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+// Eliminada la ruta GET no recomendada para producción
 
 module.exports = router;

@@ -1,34 +1,16 @@
 const express = require('express');
-const ProductManager = require('../../dao/mongo/productManager'); // Asegúrate de que la ruta es correcta.
+// Asegúrate de ajustar esta ruta a la ubicación real de tu ProductManager
+const productManager = require('../../dao/mongo/productManager');
 const router = express.Router();
 
-const productManager = new ProductManager();
-
-// Listar todos los productos
+// Listar todos los productos con soporte para paginación y filtrado
 router.get('/', async (req, res) => {
+    const { limit = 10, page = 1, sort, query } = req.query;
     try {
-        const limit = req.query.limit ? parseInt(req.query.limit, 10) : null;
-        const products = await productManager.getAllProducts();
-        res.json(limit ? products.slice(0, limit) : products);
+        const options = { limit, page, sort, query };
+        const products = await productManager.getProducts(options);
+        res.json(products);
     } catch (error) {
-        res.status(500).send(error.message);
-    }
-});
-
-// Obtener un producto por ID usando el _id de MongoDB
-router.get('/:id', async (req, res) => {
-    try {
-        const product = await productManager.getProductById(req.params.id); // Cambiado para usar el _id de MongoDB directamente
-        if (product) {
-            res.json(product);
-        } else {
-            res.status(404).send('Producto no encontrado');
-        }
-    } catch (error) {
-        // Modificado para manejar errores de casting de ObjectId
-        if (error.name === 'CastError') {
-            return res.status(400).send('ID de producto inválido');
-        }
         res.status(500).send(error.message);
     }
 });
@@ -46,8 +28,8 @@ router.post('/', async (req, res) => {
 // Actualizar un producto por ID
 router.put('/:id', async (req, res) => {
     try {
-        const updatedProduct = await productManager.updateProduct(req.params.id, req.body); // Cambiado para usar el _id de MongoDB directamente
-        if(updatedProduct) {
+        const updatedProduct = await productManager.updateProduct(req.params.id, req.body);
+        if (updatedProduct) {
             res.json(updatedProduct);
         } else {
             res.status(404).send('Producto no encontrado');
@@ -63,11 +45,12 @@ router.put('/:id', async (req, res) => {
 // Eliminar un producto por ID
 router.delete('/:id', async (req, res) => {
     try {
-        const result = await productManager.deleteProduct(req.params.id); // Cambiado para usar el _id de MongoDB directamente
-        if(result.deletedCount === 0) {
-            return res.status(404).send('Producto no encontrado');
+        const result = await productManager.deleteProduct(req.params.id);
+        if (result) {
+            res.send('Producto eliminado');
+        } else {
+            res.status(404).send('Producto no encontrado');
         }
-        res.send('Producto eliminado');
     } catch (error) {
         if (error.name === 'CastError') {
             return res.status(400).send('ID de producto inválido');
