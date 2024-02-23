@@ -8,15 +8,14 @@ const cartManager = new CartManager();
 // Crear un nuevo carrito
 router.post('/', async (req, res) => {
     try {
-        console.log('Creando un nuevo carrito...'); // Agrega esto para depuración
         const newCart = await cartManager.createCart();
+        // Guarda el ID del carrito en una cookie
         res.cookie('cartId', newCart._id.toString());
         res.status(201).json(newCart);
     } catch (error) {
         res.status(500).send(error.message);
     }
 });
-
 
 // Listar productos en un carrito específico
 router.get('/:cid', async (req, res) => {
