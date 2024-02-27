@@ -13,5 +13,9 @@
         <input type="password" id="password" name="password" required>
         <button type="submit">Iniciar Sesión</button>
     </form>
+    {{#if error}}
+    <div style="color: red;">{{error}}</div>
+    {{/if}}
+
 </body>
 </html>

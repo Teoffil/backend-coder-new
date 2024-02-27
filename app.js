@@ -71,12 +71,16 @@ app.get('/chat', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-    res.render('register');
+    const errorMessage = req.query.error; // Captura el mensaje de error de los parámetros de consulta.
+    res.render('register', { error: errorMessage }); // Pasa el mensaje de error a la vista.
 });
 
+
 app.get('/login', (req, res) => {
-    res.render('login');
+    const errorMessage = req.query.error; // Captura el mensaje de error de los parámetros de consulta
+    res.render('login', { error: errorMessage }); // Pasa el mensaje de error a la vista
 });
+
 
 app.get('/products', async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
