@@ -1,7 +1,16 @@
+// src/api/products/productsRouter.js
 const express = require('express');
-// Asegúrate de ajustar esta ruta a la ubicación real de tu ProductManager
+const User = require('../../dao/models/UserSchema'); // Asegúrate de ajustar la ruta al archivo UserSchema.js
 const productManager = require('../../dao/mongo/productManager');
 const router = express.Router();
+
+// Middleware para cargar el usuario
+router.use(async (req, res, next) => {
+    if (req.session.userId) {
+        req.user = await User.findById(req.session.userId);
+    }
+    next();
+});
 
 // Listar todos los productos con soporte para paginación y filtrado
 router.get('/', async (req, res) => {
@@ -9,7 +18,11 @@ router.get('/', async (req, res) => {
     try {
         const options = { limit, page, sort, query };
         const products = await productManager.getProducts(options);
-        res.json(products);
+        res.render('products', { 
+            products: products.docs, 
+            user: req.user, // Pasa el usuario a la vista
+            // ...
+        });
     } catch (error) {
         res.status(500).send(error.message);
     }

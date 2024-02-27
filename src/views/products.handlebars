@@ -7,12 +7,16 @@
 <body>
     <h1>Productos</h1>
     {{#if user}}
-            <p>Bienvenido, {{user.email}}</p>
-            <p>Rol: {{user.role}}</p>
-            <button onclick="location.href='/auth/logout'">Logout</button>
-        {{else}}
-            <button onclick="location.href='/register'">Registrarse</button>
-            <button onclick="location.href='/login'">Iniciar Sesión</button>
+        <p>Bienvenido, adminCoder@coder.com</p>
+        <p>Rol: {{user.role}}</p>
+        {{#eq user.role 'admin'}}
+            <!-- Opciones específicas del administrador aquí -->
+            
+        {{/eq}}
+        <button onclick="location.href='/auth/logout'">Logout</button>
+    {{else}}
+        <button onclick="location.href='/register'">Registrarse</button>
+        <button onclick="location.href='/login'">Iniciar Sesión</button>
     {{/if}}
     <ul>
         {{#each products}}

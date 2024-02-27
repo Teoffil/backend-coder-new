@@ -1,8 +1,7 @@
 // Importación de módulos y librerías
 const express = require('express');
-const { engine } = require('express-handlebars');
+const exphbs  = require('express-handlebars');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
-const Handlebars = require('handlebars');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
@@ -17,6 +16,14 @@ const authRouter = require('./src/api/auth/authRouter');
 const Message = require('./src/dao/models/MessageSchema');
 const productManager = require('./src/dao/mongo/productManager');
 const User = require('./src/dao/models/UserSchema');
+
+// Creación de una nueva instancia de Handlebars
+const Handlebars = allowInsecurePrototypeAccess(exphbs.create().handlebars);
+
+// Registro del helper 'eq' con Handlebars
+Handlebars.registerHelper('eq', function(arg1, arg2, options) {
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
 
 // Configuración de la base de datos
 require('dotenv').config();
@@ -37,9 +44,7 @@ app.use(session({
 }));
 
 // Configuración de Handlebars
-app.engine('handlebars', engine({
-    handlebars: allowInsecurePrototypeAccess(Handlebars)
-}));
+app.engine('handlebars', exphbs.engine({ handlebars: Handlebars }));
 app.set('view engine', 'handlebars');
 app.set('views', './src/views');
 
@@ -79,13 +84,18 @@ app.get('/products', async (req, res) => {
         const products = await productManager.getProducts({ page: parseInt(page), limit: parseInt(limit) });
         const cartId = req.cookies.cartId; // Obtén el ID del carrito de la cookie
 
-        // Busca el usuario en la base de datos
-        const user = req.session.userId ? await User.findById(req.session.userId) : null;
+        // Modificación aquí: Crea un objeto de usuario basado en la sesión
+        let user = null;
+        if (req.session.role === 'admin') {
+            user = { role: 'admin' }; // Define un usuario administrador
+        } else if (req.session.userId) {
+            user = await User.findById(req.session.userId); // Busca el usuario en la base de datos
+        }
 
         res.render('products', { 
             products: products.docs, 
             cartId: cartId,
-            user: user, // Pasa el usuario a la vista
+            user: user, // Pasa el objeto de usuario a la vista
             prevPage: products.prevPage, 
             nextPage: products.nextPage,
             page,
@@ -98,6 +108,7 @@ app.get('/products', async (req, res) => {
         res.status(500).send(error.message);
     }
 });
+
 
 app.get('/products/:productId', async (req, res) => {
     try {

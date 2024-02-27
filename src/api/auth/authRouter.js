@@ -17,7 +17,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         // Comprueba si las credenciales ingresadas son las del administrador
-        if (req.body.email === 'adminCoder@coder.com' && req.body.password === 'adminCod3r123') {
+        if (req.body.email === process.env.ADMIN_EMAIL && req.body.password === process.env.ADMIN_PASSWORD) {
             req.session.role = 'admin';
             return res.redirect('/products');
         }
