@@ -8,6 +8,7 @@
     <h1>Productos</h1>
     {{#if user}}
             <p>Bienvenido, {{user.email}}</p>
+            <p>Rol: {{user.role}}</p>
             <button onclick="location.href='/auth/logout'">Logout</button>
         {{else}}
             <button onclick="location.href='/register'">Registrarse</button>

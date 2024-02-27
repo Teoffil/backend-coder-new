@@ -6,15 +6,6 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
     try {
         const user = new User(req.body);
-
-        // Comprueba el correo electrónico y la contraseña antes de guardar el usuario
-        if (user.email === process.env.ADMIN_EMAIL && user.password === process.env.ADMIN_PASSWORD) {
-            user.role = 'admin';
-            req.session.role = 'admin';
-        } else {
-            req.session.role = 'usuario';
-        }
-
         await user.save();
         req.session.userId = user._id;
         res.redirect('/products');
@@ -23,11 +14,10 @@ router.post('/register', async (req, res) => {
     }
 });
 
-
 router.post('/login', async (req, res) => {
     try {
         // Comprueba si las credenciales ingresadas son las del administrador
-        if (req.body.email === process.env.ADMIN_EMAIL && req.body.password === process.env.ADMIN_PASSWORD) {
+        if (req.body.email === 'adminCoder@coder.com' && req.body.password === 'adminCod3r123') {
             req.session.role = 'admin';
             return res.redirect('/products');
         }
@@ -44,7 +34,6 @@ router.post('/login', async (req, res) => {
         res.status(500).send(error.message);
     }
 });
-
 
 router.get('/logout', (req, res) => {
     req.session.destroy(err => {
