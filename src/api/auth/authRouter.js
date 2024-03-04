@@ -1,24 +1,7 @@
 const express = require('express');
-const User = require('../../dao/models/UserSchema'); 
+const passport = require('passport');
+const User = require('../../dao/models/UserSchema');
 const router = express.Router();
-
-router.post('/register', async (req, res) => {
-    try {
-        const existingUser = await User.findOne({ email: req.body.email });
-        if (existingUser) {
-            // Si el correo ya existe, redirige con un mensaje de error.
-            return res.redirect('/register?error=El%20correo%20ya%20existe');
-        }
-
-        const user = new User(req.body);
-        await user.save();
-        req.session.userId = user._id;
-        res.redirect('/products');
-    } catch (error) {
-        // Para cualquier otro error de validación, redirige con un mensaje genérico.
-        res.redirect('/register?error=Uno%20de%20los%20campos%20ingresados%20no%20cumple%20con%20lo%20requerido');
-    }
-});
 
 router.post('/login', async (req, res) => {
     try {
@@ -51,5 +34,26 @@ router.get('/logout', (req, res) => {
         res.redirect('/products');
     });
 });
+// Ruta para iniciar la autenticación con GitHub
+router.get('/github', passport.authenticate('github'))
+
+// Ruta para manejar el callback después de la autenticación con GitHub
+router.get('/github/callback', passport.authenticate('github', { failureRedirect: '/login' }), (req, res) => {
+    // Autenticación exitosa, establecer la información del usuario en la sesión.
+    req.session.userId = req.user._id;
+    req.session.role = req.user.role || 'usuario'; // Ajusta según cómo estés manejando los roles
+    res.redirect('/products');
+});
+
+router.get('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.redirect('/products');
+        }
+        res.clearCookie('connect.sid');
+        res.redirect('/');
+    });
+});
 
 module.exports = router;
+
