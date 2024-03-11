@@ -77,10 +77,14 @@ passport.use('local-register', new LocalStrategy({
         if (existingUser) {
             return done(null, false, { message: 'El correo ya existe' });
         }
-
         const user = new User({
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
             email: email,
-            password: password
+            age: req.body.age,
+            password: password,
+            cart: req.body.cart,  // Asegúrate de que esto se maneje adecuadamente en tu lógica
+            role: 'user'
         });
 
         await user.save();
@@ -90,6 +94,7 @@ passport.use('local-register', new LocalStrategy({
         return done(error);
     }
 }));
+
 
 // Configura la estrategia local de login aquí, usando tu lógica existente de authRouter.js
 passport.use('local-login', new LocalStrategy({
@@ -131,10 +136,6 @@ passport.use(new GitHubStrategy({
         return done(error);
     }
 }));
-
-
-
-
 
 
 // Configuración de Handlebars
@@ -212,6 +213,20 @@ app.get('/products/:productId', async (req, res) => {
         res.status(500).send(error.message);
     }
 });
+
+app.get('/current', async (req, res) => {
+    if (req.session.userId) {
+        try {
+            const user = await User.findById(req.session.userId);
+            res.json({ user: user });
+        } catch (error) {
+            res.status(500).send('Error fetching user');
+        }
+    } else {
+        res.status(401).send('No user is currently logged in.');
+    }
+});
+
 
 // Configuración de Socket.io para el chat
 io.on('connection', (socket) => {

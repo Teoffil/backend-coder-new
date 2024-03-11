@@ -18,7 +18,8 @@ router.post('/login', async (req, res) => {
             return res.redirect('/login?error=El%20usuario%20o%20la%20contraseña%20son%20erróneos,%20por%20favor%20vuelva%20a%20verificar');
         }
         req.session.userId = user._id;
-        req.session.role = 'usuario';
+        req.session.role = user.role || 'usuario';
+        console.log('Sesión establecida:', req.session);
         res.redirect('/products');
     } catch (error) {
         res.status(500).send(error.message);
@@ -45,6 +46,17 @@ router.get('/github/callback', passport.authenticate('github', { failureRedirect
     res.redirect('/products');
 });
 
+// Ruta para obtener el usuario actual basado en la sesión
+router.get('/current', (req, res) => {
+    console.log('Usuario actual:', req.user);
+    console.log('Sesión actual:', req.session);
+    if (req.isAuthenticated()) {
+        res.json({ user: req.user });
+    } else {
+        res.status(401).json({ message: 'No user logged in' });
+    }
+});
+
 router.get('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
@@ -54,6 +66,32 @@ router.get('/logout', (req, res) => {
         res.redirect('/');
     });
 });
+
+router.post('/register', async (req, res) => {
+    try {
+        const { first_name, last_name, email, password, age } = req.body;
+        const existingUser = await User.findOne({ email: email });
+        if (existingUser) {
+            return res.redirect('/register?error=El correo ya existe');
+        }
+        const newUser = new User({
+            first_name,
+            last_name,
+            email,
+            password, // Recuerda hashearla
+            age,
+            role: 'usuario' // o cualquier lógica para establecer roles
+        });
+        await newUser.save();
+        // Iniciar sesión automáticamente después del registro o redirigir al login
+        req.session.userId = newUser._id;
+        req.session.role = newUser.role;
+        res.redirect('/products');
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
 
 module.exports = router;
 
