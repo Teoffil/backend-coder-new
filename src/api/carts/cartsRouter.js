@@ -1,5 +1,5 @@
 const express = require('express');
-const CartManager = require('../../dao/mongo/cartManager'); // Asegúrate de que la ruta sea correcta
+const CartManager = require('../../dao/mongo/cartManager');
 const router = express.Router();
 const mongoose = require('mongoose');
 
@@ -9,7 +9,6 @@ const cartManager = new CartManager();
 router.post('/', async (req, res) => {
     try {
         const newCart = await cartManager.createCart();
-        // Guarda el ID del carrito en una cookie
         res.cookie('cartId', newCart._id.toString());
         res.status(201).json(newCart);
     } catch (error) {
@@ -21,18 +20,24 @@ router.post('/', async (req, res) => {
 router.get('/:cid', async (req, res) => {
     const cartId = req.params.cid;
 
-    // Verificar si cartId es un ObjectId válido
     if (!mongoose.Types.ObjectId.isValid(cartId)) {
         return res.status(400).send('ID de carrito no válido');
     }
 
     try {
         const cart = await cartManager.getCartById(cartId);
-        res.render('cartDetails', { cart }); // Asegúrate de tener la vista cartDetails.handlebars
+        if (!cart) {
+            return res.status(404).send('Carrito no encontrado');
+        } else if (cart.products.length === 0) {
+            return res.status(200).send('Carrito vacío');
+        } else {
+            res.render('cartDetails', { cart: cart });
+        }
     } catch (error) {
         res.status(500).send(error.message);
     }
 });
+
 
 // Agregar un producto al carrito
 router.post('/:cid/products', async (req, res) => {
@@ -73,7 +78,5 @@ router.delete('/:cid', async (req, res) => {
         res.status(500).send(error.message);
     }
 });
-
-// Eliminada la ruta GET no recomendada para producción
 
 module.exports = router;

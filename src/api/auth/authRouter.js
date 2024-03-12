@@ -1,30 +1,48 @@
 const express = require('express');
 const passport = require('passport');
 const User = require('../../dao/models/UserSchema');
+const Cart = require('../../dao/models/CartSchema');
 const router = express.Router();
 
 router.post('/login', async (req, res) => {
     try {
-        // Comprueba si las credenciales ingresadas son las del administrador
+        // Primero, verifica si el usuario es el administrador.
         if (req.body.email === process.env.ADMIN_EMAIL && req.body.password === process.env.ADMIN_PASSWORD) {
             req.session.role = 'admin';
             return res.redirect('/products');
         }
 
-        // Si no, procede con el inicio de sesión normal
+        // Si no es el administrador, continúa con la verificación normal del usuario.
         const user = await User.findOne({ email: req.body.email });
         if (!user || !user.comparePassword(req.body.password)) {
-            // Cambio aquí para redirigir con un mensaje de error
+            // Si las credenciales son incorrectas, redirige al login con un mensaje de error.
             return res.redirect('/login?error=El%20usuario%20o%20la%20contraseña%20son%20erróneos,%20por%20favor%20vuelva%20a%20verificar');
         }
-        req.session.userId = user._id;
-        req.session.role = user.role || 'usuario';
-        console.log('Sesión establecida:', req.session);
-        res.redirect('/products');
-    } catch (error) {
-        res.status(500).send(error.message);
-    }
+
+         // Crea un nuevo carrito cada vez que el usuario inicia sesión.
+            let cart = await Cart.create({ user: user._id, products: [] });
+            user.cartId = cart._id;
+            await user.save();
+    
+            // Configura la sesión del usuario.
+            req.session.userId = user._id;
+            req.session.role = user.role || 'usuario';
+            req.session.cartId = cart._id;
+    
+            // Redirige al usuario a la página de productos.
+            res.redirect('/products');
+        } catch (error) {
+            res.status(500).send(error.message);
+        }
 });
+
+function haCaducado(cart) {
+    // Implementa la lógica para determinar si el carrito ha caducado.
+    const tiempoMaximo = 10 * 60 * 1000; //  10 min 
+    const tiempoTranscurrido = new Date() - cart.updatedAt;
+    return tiempoTranscurrido > tiempoMaximo;
+}
+
 
 router.get('/logout', (req, res) => {
     req.session.destroy(err => {
@@ -70,27 +88,47 @@ router.get('/logout', (req, res) => {
 router.post('/register', async (req, res) => {
     try {
         const { first_name, last_name, email, password, age } = req.body;
+        
+        // Verificar si el usuario ya existe
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
             return res.redirect('/register?error=El correo ya existe');
         }
-        const newUser = new User({
+
+        // Crear un nuevo usuario (aún no lo guardamos en la base de datos)
+        let newUser = new User({
             first_name,
             last_name,
             email,
-            password, // Recuerda hashearla
+            password,  // Aquí deberías hashear la contraseña antes de asignarla
             age,
-            role: 'usuario' // o cualquier lógica para establecer roles
+            role: 'usuario'
         });
+
+        // Crear un nuevo carrito para el usuario
+        const newCart = await new Cart({ user: newUser._id, products: [] }).save();
+
+        // Asignar el ID del carrito al usuario
+        newUser.cart = newCart._id;
+
+        // Guardar el usuario en la base de datos
         await newUser.save();
-        // Iniciar sesión automáticamente después del registro o redirigir al login
+
+        // Configurar la sesión para el nuevo usuario
         req.session.userId = newUser._id;
         req.session.role = newUser.role;
+        req.session.cartId = newCart._id;
+
+        // Redirigir al usuario a la página de productos
         res.redirect('/products');
     } catch (error) {
+        console.error(error);
         res.status(500).send(error.message);
     }
 });
+
+
+
 
 
 module.exports = router;

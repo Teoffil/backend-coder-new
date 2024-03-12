@@ -32,7 +32,12 @@
         {{/each}}
     </ul>
     <!-- Botón para ver el carrito -->
-    <a href="/carts/65d164a20b30c329286c4c5a">Ver Carrito</a>
+    {{#if user.cartId}}
+        <a href="/carts/{{user.cartId}}">Ver carrito</a>
+    {{else}}
+        <a href="#">Carrito no disponible</a>
+    {{/if}}
+    
     <!-- Paginación -->
     {{#if prevPage}}
         <button onclick="location.href='/products?page={{prevPage}}'">Anterior</button>
@@ -42,8 +47,8 @@
     {{/if}}
     <script>
         function addToCart(productId) {
-            // Utiliza el ID del carrito que ya está creado
-            const cartId = '65d164a20b30c329286c4c5a';
+            // Obtiene el ID del carrito del usuario desde la sesión o donde esté almacenado
+            const cartId = '{{user.cartId}}'; // Utiliza la variable handlebars para obtener el cartId dinámicamente
             fetch(`/carts/${cartId}/products`, {
                 method: 'POST',
                 headers: {

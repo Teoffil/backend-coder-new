@@ -156,6 +156,14 @@ app.use('/api/products', productsRouter);
 app.use('/carts', cartsRouter);
 app.use('/auth', authRouter);
 
+Handlebars.registerHelper('multiply', function(a, b) { return a * b; });
+Handlebars.registerHelper('totalPrice', function(products) {
+    return products.reduce((total, product) => {
+        return total + (product.quantity * product.productId.price);
+    }, 0);
+});
+
+
 // Configuración de las rutas de la aplicación
 app.get('/', (req, res) => {
     res.render('home');
@@ -179,18 +187,18 @@ app.get('/products', async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     try {
         const products = await productManager.getProducts({ page: parseInt(page), limit: parseInt(limit) });
-        const cartId = req.cookies.cartId;
-
+        
         let user = null;
         if (req.session.role === 'admin') {
             user = { role: 'admin' };
         } else if (req.session.userId) {
             user = await User.findById(req.session.userId);
+            // Utiliza el cartId desde la sesión
+            user.cartId = req.session.cartId;
         }
 
         res.render('products', {
             products: products.docs,
-            cartId: cartId,
             user: user,
             prevPage: products.prevPage,
             nextPage: products.nextPage,
@@ -245,6 +253,20 @@ io.on('connection', (socket) => {
         });
     });
 });
+
+// Actualización de carritos
+// const INTERVAL_TIME = 60000;
+// setInterval(async () => {
+//     const TEN_MINUTES = 10 * 60 * 1000; // 10 minutos en milisegundos
+//     const carts = await Cart.find();
+    
+//     carts.forEach(async (cart) => {
+//         if (new Date() - cart.createdAt > TEN_MINUTES) {
+//             await Cart.findByIdAndDelete(cart._id);
+//         }
+//     });
+// }, INTERVAL_TIME);
+
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 8080;
