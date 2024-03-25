@@ -20,6 +20,7 @@ const authRouter = require('./src/api/auth/authRouter');
 const Message = require('./src/dao/models/MessageSchema');
 const productManager = require('./src/dao/mongo/productManager');
 const User = require('./src/dao/models/UserSchema');
+const { githubClientId, githubClientSecret, port } = require('./config');
 
 // Creación de una nueva instancia de Handlebars
 const Handlebars = allowInsecurePrototypeAccess(exphbs.create().handlebars);
@@ -113,8 +114,8 @@ passport.use('local-login', new LocalStrategy({
 }));
 
 passport.use(new GitHubStrategy({
-    clientID: process.env.GITHUB_CLIENT_ID,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    clientID: githubClientId,
+    clientSecret: githubClientSecret,
     callbackURL: "http://localhost:8080/auth/github/callback"
 }, async (accessToken, refreshToken, profile, done) => {
     try {
@@ -269,5 +270,4 @@ io.on('connection', (socket) => {
 
 
 // Iniciar el servidor
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
+server.listen(port, () => console.log(`Servidor corriendo en el puerto ${port}`));
