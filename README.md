@@ -27,7 +27,7 @@ PORT=8080
 
 
 Desarrollo
-Información sobre cómo contribuir al proyecto, pruebas, y cualquier otra información relevante para desarrolladores.
+Información
 bash
 Copy code
 npm run dev
