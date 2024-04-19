@@ -3,8 +3,9 @@ const Cart = require('../models/CartSchema');
 class CartManager {
     constructor() {}
 
-    async createCart() {
-        const cart = new Cart();
+    // Método corregido para incluir el userId al crear un carrito
+    async createCart(userId) {
+        const cart = new Cart({ user: userId });
         await cart.save();
         return cart;
     }
@@ -57,7 +58,6 @@ class CartManager {
         return cart;
     }
 
-    // Nuevo método para actualizar la cantidad de un producto específico
     async updateProductQuantity(cartId, productId, quantity) {
         const cart = await Cart.findById(cartId);
         if (!cart) {
@@ -77,4 +77,3 @@ class CartManager {
 }
 
 module.exports = CartManager;
-

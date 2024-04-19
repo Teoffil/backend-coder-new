@@ -1,7 +1,11 @@
-const User = require('../dao/models/UserSchema');
-const Cart = require('../dao/models/CartSchema');
+const UserDAO = require('../dao/mongo/UserDAO');
+const CartDAO = require('../dao/mongo/CartDAO');
+const UserDTO = require('../dto/UserDTO'); 
 const passport = require('passport');
 const { adminEmail, adminPassword } = require('../../config');
+
+const userDAO = new UserDAO();
+const cartDAO = new CartDAO();
 
 const authController = {
     login: async (req, res) => {
@@ -11,15 +15,12 @@ const authController = {
                 return res.redirect('/products');
             }
 
-            const user = await User.findOne({ email: req.body.email });
-            if (!user || !user.comparePassword(req.body.password)) {
+            const user = await userDAO.getUserByEmail(req.body.email);
+            if (!user || !await user.comparePassword(req.body.password)) {
                 return res.redirect('/login?error=El%20usuario%20o%20la%20contraseña%20son%20erróneos,%20por%20favor%20vuelva%20a%20verificar');
             }
 
-            let cart = await Cart.create({ user: user._id, products: [] });
-            user.cartId = cart._id;
-            await user.save();
-
+            let cart = await cartDAO.createCart(user._id);
             req.session.userId = user._id;
             req.session.role = user.role || 'usuario';
             req.session.cartId = cart._id;
@@ -44,12 +45,12 @@ const authController = {
         try {
             const { first_name, last_name, email, password, age } = req.body;
             
-            const existingUser = await User.findOne({ email: email });
+            const existingUser = await userDAO.getUserByEmail(email);
             if (existingUser) {
                 return res.redirect('/register?error=El correo ya existe');
             }
 
-            let newUser = new User({
+            const newUser = await userDAO.createUser({
                 first_name,
                 last_name,
                 email,
@@ -58,10 +59,15 @@ const authController = {
                 role: 'usuario'
             });
 
-            const newCart = await new Cart({ user: newUser._id, products: [] }).save();
-            newUser.cart = newCart._id;
+            // Asegúrate de que el usuario se ha creado correctamente antes de intentar crear un carrito
+            if (!newUser) {
+                throw new Error('No se pudo crear el usuario.');
+            }
 
-            await newUser.save();
+            const newCart = await cartDAO.createCart(newUser._id);
+            if (!newCart) {
+                throw new Error('No se pudo crear el carrito.');
+            }
 
             req.session.userId = newUser._id;
             req.session.role = newUser.role;
@@ -81,9 +87,11 @@ const authController = {
         res.redirect('/products');
     }),
 
-    currentUser: (req, res) => {
+    currentUser: async (req, res) => {
         if (req.isAuthenticated()) {
-            res.json({ user: req.user });
+            const user = await userDAO.getUserById(req.session.userId);
+            const userDto = new UserDTO(user);
+            res.json({ user: userDto });
         } else {
             res.status(401).json({ message: 'No user logged in' });
         }

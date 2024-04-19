@@ -3,26 +3,38 @@ const express = require('express');
 const exphbs = require('express-handlebars');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const http = require('http');
-const path = require('path');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
+const UserDTO = require('./src/dto/UserDTO');
 
 // Importación de routers y modelos
 const productsRouter = require('./src/api/products/productsRouter');
 const cartsRouter = require('./src/api/carts/cartsRouter');
 const authRouter = require('./src/api/auth/authRouter');
-const productManager = require('./src/dao/mongo/productManager');
+const messageRoutes = require('./src/api/messages/messageRoutes');
+const ProductDAO = require('./src/dao/mongo/ProductDAO');
+const productManager = new ProductDAO(); // Creando una instancia de ProductDAO
 const User = require('./src/dao/models/UserSchema');
 const { port } = require('./config');
 
-// Creación de una nueva instancia de Handlebars
-const Handlebars = allowInsecurePrototypeAccess(exphbs.create().handlebars);
+// Creación de una nueva instancia de Handlebars y configuración de helpers
+const Handlebars = exphbs.create({
+    handlebars: allowInsecurePrototypeAccess(require('handlebars'))
+});
 
-// Registro del helper 'eq' con Handlebars
-Handlebars.registerHelper('eq', function(arg1, arg2, options) {
+// Registro de helpers 'eq', 'multiply' y 'totalPrice'
+Handlebars.handlebars.registerHelper('eq', function(arg1, arg2, options) {
     return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+Handlebars.handlebars.registerHelper('multiply', function(value1, value2) {
+    return value1 * value2;
+});
+Handlebars.handlebars.registerHelper('totalPrice', function(products) {
+    return products.reduce((total, product) => {
+        return total + (product.productId.price * product.quantity);
+    }, 0);
 });
 
 // Configuración de la base de datos
@@ -46,11 +58,10 @@ app.use(session({
 const passport = require('./src/config/passport');
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash())
+app.use(flash());
 
-
-// Configuración de Handlebars
-app.engine('handlebars', exphbs.engine({ handlebars: Handlebars }));
+// Configuración de Handlebars como motor de plantillas
+app.engine('handlebars', exphbs.engine({ handlebars: Handlebars.handlebars }));
 app.set('view engine', 'handlebars');
 app.set('views', './src/views');
 
@@ -62,52 +73,40 @@ app.use(express.urlencoded({ extended: true }));
 // Configuración de las rutas estáticas
 app.use(express.static('public'));
 
-// Configuración de las rutas de la API
-app.use('/api/products', productsRouter);
-app.use('/carts', cartsRouter);
-app.use('/auth', authRouter);
-
-Handlebars.registerHelper('multiply', function(a, b) { return a * b; });
-Handlebars.registerHelper('totalPrice', function(products) {
-    return products.reduce((total, product) => {
-        return total + (product.quantity * product.productId.price);
-    }, 0);
-});
-
+// Configuración de las rutas de la API usando un router común
+const apiRouter = express.Router();
+apiRouter.use('/products', productsRouter);
+apiRouter.use('/carts', cartsRouter);
+apiRouter.use('/auth', authRouter);
+apiRouter.use('/messages', messageRoutes);
+app.use('/api', apiRouter);
 
 // Configuración de las rutas de la aplicación
 app.get('/', (req, res) => {
     res.render('home');
 });
-
 app.get('/chat', (req, res) => {
     res.render('chat');
 });
-
 app.get('/register', (req, res) => {
     const errorMessage = req.query.error;
     res.render('register', { error: errorMessage });
 });
-
 app.get('/login', (req, res) => {
     const errorMessage = req.query.error;
     res.render('login', { error: errorMessage });
 });
-
 app.get('/products', async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     try {
         const products = await productManager.getProducts({ page: parseInt(page), limit: parseInt(limit) });
-        
         let user = null;
         if (req.session.role === 'admin') {
             user = { role: 'admin' };
         } else if (req.session.userId) {
             user = await User.findById(req.session.userId);
-            // Utiliza el cartId desde la sesión
             user.cartId = req.session.cartId;
         }
-
         res.render('products', {
             products: products.docs,
             user: user,
@@ -120,25 +119,27 @@ app.get('/products', async (req, res) => {
             nextLink: `/products?page=${products.nextPage}`
         });
     } catch (error) {
+        console.error("Error fetching products: ", error);
         res.status(500).send(error.message);
     }
 });
-
 app.get('/products/:productId', async (req, res) => {
     try {
         const product = await productManager.getProductById(req.params.productId);
         res.render('productDetails', { product });
     } catch (error) {
+        console.error("Error fetching product details: ", error);
         res.status(500).send(error.message);
     }
 });
-
 app.get('/current', async (req, res) => {
     if (req.session.userId) {
         try {
             const user = await User.findById(req.session.userId);
-            res.json({ user: user });
+            const userDto = new UserDTO(user);  // Usando UserDTO para filtrar los datos
+            res.json(userDto);
         } catch (error) {
+            console.error("Error fetching user: ", error);
             res.status(500).send('Error fetching user');
         }
     } else {

@@ -65,7 +65,7 @@ passport.use('local-login', new LocalStrategy({
 passport.use(new GitHubStrategy({
     clientID: githubClientId,
     clientSecret: githubClientSecret,
-    callbackURL: "http://localhost:8080/auth/github/callback"
+    callbackURL: "http://localhost:8080/api/auth/github/callback"
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         let user = await User.findOne({ githubId: profile.id });

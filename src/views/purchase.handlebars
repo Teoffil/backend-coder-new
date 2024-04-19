@@ -1,0 +1,29 @@
+{{! src/views/purchase.handlebars }}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resultado de la Compra</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+    <h1>Resultado de la Compra</h1>
+    {{#if purchaseSuccess}}
+    <p>Tu compra ha sido completada exitosamente. Aquí está tu recibo:</p>
+    <ul>
+        <li>ID del Ticket: {{ticketId}}</li>
+        <li>Total Pagado: ${{totalAmount}}</li>
+        <li>Fecha de la Compra: {{purchaseDate}}</li>
+    </ul>
+    {{else}}
+    <p>Algunos productos no pudieron ser procesados debido a falta de stock:</p>
+    <ul>
+        {{#each unprocessedItems}}
+        <li>{{this}}</li>
+        {{/each}}
+    </ul>
+    <p>Revisa tu carrito para hacer los ajustes necesarios.</p>
+    {{/if}}
+    <a href="/carts/{{cartId}}">Volver al Carrito</a>
+    <a href="/products">Continuar Comprando</a>
+</body>
+</html>
