@@ -1,8 +1,9 @@
 const UserDAO = require('../dao/mongo/UserDAO');
 const CartDAO = require('../dao/mongo/CartDAO');
-const UserDTO = require('../dto/UserDTO'); 
+const UserDTO = require('../dto/UserDTO');
 const passport = require('passport');
-const { adminEmail, adminPassword } = require('../../config');
+const jwt = require('jsonwebtoken');
+const { adminEmail, adminPassword, JWT_SECRET } = require('../../config');
 
 const userDAO = new UserDAO();
 const cartDAO = new CartDAO();
@@ -11,21 +12,20 @@ const authController = {
     login: async (req, res) => {
         try {
             if (req.body.email === adminEmail && req.body.password === adminPassword) {
-                req.session.role = 'admin';
-                return res.redirect('/products');
+                // Generar token para admin
+                const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '1h' });
+                return res.json({ token });
             }
 
             const user = await userDAO.getUserByEmail(req.body.email);
             if (!user || !await user.comparePassword(req.body.password)) {
-                return res.redirect('/login?error=El%20usuario%20o%20la%20contraseña%20son%20erróneos,%20por%20favor%20vuelva%20a%20verificar');
+                return res.status(401).json({ error: 'El usuario o la contraseña son erróneos' });
             }
 
             let cart = await cartDAO.createCart(user._id);
-            req.session.userId = user._id;
-            req.session.role = user.role || 'usuario';
-            req.session.cartId = cart._id;
+            const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
 
-            res.redirect('/products');
+            res.json({ token, userId: user._id, cartId: cart._id });
         } catch (error) {
             res.status(500).send(error.message);
         }
@@ -34,10 +34,10 @@ const authController = {
     logout: (req, res) => {
         req.session.destroy(err => {
             if (err) {
-                return res.redirect('/products');
+                return res.status(500).send('Failed to logout');
             }
             res.clearCookie('connect.sid');
-            res.redirect('/');
+            res.send('Logged out');
         });
     },
 
@@ -47,7 +47,7 @@ const authController = {
             
             const existingUser = await userDAO.getUserByEmail(email);
             if (existingUser) {
-                return res.redirect('/register?error=El correo ya existe');
+                return res.status(409).json({ error: 'El correo ya existe' });
             }
 
             const newUser = await userDAO.createUser({
@@ -59,7 +59,6 @@ const authController = {
                 role: 'usuario'
             });
 
-            // Asegúrate de que el usuario se ha creado correctamente antes de intentar crear un carrito
             if (!newUser) {
                 throw new Error('No se pudo crear el usuario.');
             }
@@ -69,11 +68,7 @@ const authController = {
                 throw new Error('No se pudo crear el carrito.');
             }
 
-            req.session.userId = newUser._id;
-            req.session.role = newUser.role;
-            req.session.cartId = newCart._id;
-
-            res.redirect('/products');
+            res.status(201).json({ message: 'User registered', userId: newUser._id });
         } catch (error) {
             res.status(500).send(error.message);
         }
@@ -82,9 +77,9 @@ const authController = {
     githubAuth: passport.authenticate('github'),
 
     githubCallback: passport.authenticate('github', { failureRedirect: '/login' }, (req, res) => {
-        req.session.userId = req.user._id;
-        req.session.role = req.user.role || 'usuario';
-        res.redirect('/products');
+        // Suponiendo que la autenticación de GitHub también debería devolver un token.
+        const token = jwt.sign({ id: req.user._id, role: req.user.role }, JWT_SECRET, { expiresIn: '1h' });
+        res.json({ token });
     }),
 
     currentUser: async (req, res) => {

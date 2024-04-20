@@ -5,6 +5,7 @@ const Cart = require('../../dao/models/CartSchema');
 const Product = require('../../dao/models/ProductSchema');
 const Ticket = require('../../dao/models/TicketSchema');
 const User = require('../../dao/models/UserSchema');
+const { authorize } = require('../../middleware/authorization');
 const router = express.Router();
 
 // Crear un nuevo carrito
@@ -14,7 +15,7 @@ router.post('/', cartController.createCart);
 router.get('/:cid', cartController.getCartById);
 
 // Agregar un producto al carrito
-router.post('/:cid/products', cartController.addProductToCart);
+router.post('/:cid/products', authorize(['user']), cartController.addProductToCart);
 
 
 // Eliminar un producto específico del carrito

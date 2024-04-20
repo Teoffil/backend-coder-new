@@ -1,0 +1,10 @@
+<h1>Ticket de Compra</h1>
+<p>Gracias por su compra, aquí están los detalles de su pedido:</p>
+<ul>
+    {{#each products}}
+    <li>{{quantity}} x {{name}} - ${{totalPrice}}</li>
+    {{/each}}
+</ul>
+<p>Total Pagado: ${{totalAmount}}</p>
+<p>Número de Ticket: {{ticketNumber}}</p>
+<p>Fecha de Compra: {{purchaseDate}}</p>
