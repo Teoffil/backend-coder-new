@@ -5,6 +5,7 @@ const messageDAO = new MessageDAO();
 
 const messageController = {
     getAllMessages: async (req, res) => {
+        console.log("Accediendo a getAllMessages");
         try {
             const messages = await messageDAO.getAllMessages();
             const messageDTOs = messages.map(msg => new MessageDTO(msg));

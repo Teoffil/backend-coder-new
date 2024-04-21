@@ -80,6 +80,7 @@ apiRouter.use('/carts', cartsRouter);
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/messages', messageRoutes);
 app.use('/api', apiRouter);
+app.use('/api', messageRoutes);
 
 // Configuración de las rutas de la aplicación
 app.get('/', (req, res) => {
