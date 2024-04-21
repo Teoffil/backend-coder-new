@@ -23,11 +23,11 @@ const productController = {
         try {
             const newProduct = await productDAO.addProduct(req.body);
             const productDTO = new ProductDTO(newProduct);
-            res.status(201).json(productDTO);
+            res.status(201).json(productDTO); // Envía toda la información del producto
         } catch (error) {
             res.status(500).send("Error al añadir producto: " + error.message);
         }
-    },
+    },    
 
     updateProduct: async (req, res) => {
         const { id } = req.params;
