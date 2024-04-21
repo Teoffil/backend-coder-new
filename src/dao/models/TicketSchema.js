@@ -4,7 +4,8 @@ const TicketSchema = new mongoose.Schema({
     code: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        default: () => Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
     },
     purchase_datetime: {
         type: Date,
