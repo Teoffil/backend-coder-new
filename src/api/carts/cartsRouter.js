@@ -15,7 +15,7 @@ router.post('/', cartController.createCart);
 router.get('/:cid', cartController.getCartById);
 
 // Agregar un producto al carrito
-router.post('/:cid/products', authorize(['user']), cartController.addProductToCart);
+router.post('/:cid/products', authorize(['usuario']), cartController.addProductToCart);
 
 
 // Eliminar un producto específico del carrito
