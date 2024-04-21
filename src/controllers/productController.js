@@ -20,14 +20,18 @@ const productController = {
     },
 
     addProduct: async (req, res) => {
+        console.log("Headers:", req.headers);  // Esto mostrará todos los headers de la solicitud
+        console.log("Received data for new product:", req.body);  // Esto mostrará el cuerpo de la solicitud
+
         try {
-            const newProduct = await productDAO.addProduct(req.body);
-            const productDTO = new ProductDTO(newProduct);
-            res.status(201).json(productDTO); // Envía toda la información del producto
+            const savedProduct = await productDAO.addProduct(req.body);
+            console.log("Saved product details:", savedProduct);
+            res.status(201).json(savedProduct);
         } catch (error) {
+            console.error("Error al añadir producto:", error);
             res.status(500).send("Error al añadir producto: " + error.message);
         }
-    },    
+    },  // Aquí faltaba la coma
 
     updateProduct: async (req, res) => {
         const { id } = req.params;
