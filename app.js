@@ -18,6 +18,7 @@ const ProductDAO = require('./src/dao/mongo/ProductDAO');
 const productManager = new ProductDAO(); // Creando una instancia de ProductDAO
 const User = require('./src/dao/models/UserSchema');
 const { port } = require('./config');
+const errorHandler = require('./src/middleware/errorHandler');
 
 // Creación de una nueva instancia de Handlebars y configuración de helpers
 const Handlebars = exphbs.create({
@@ -146,6 +147,9 @@ app.get('/current', async (req, res) => {
         res.status(401).send('No user is currently logged in.');
     }
 });
+
+//final de todas las rutas
+app.use(errorHandler);
 
 // Iniciar el servidor
 server.listen(port, () => console.log(`Servidor corriendo en el puerto ${port}`));

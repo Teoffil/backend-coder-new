@@ -2,6 +2,13 @@ const CartDAO = require('../dao/mongo/CartDAO');
 const ProductDAO = require('../dao/mongo/ProductDAO');
 const TicketDAO = require('../dao/mongo/TicketDAO');
 const mongoose = require('mongoose');
+const {
+    CART_NOT_FOUND,
+    INVALID_REQUEST,
+    INTERNAL_SERVER_ERROR,
+    PRODUCT_NOT_FOUND,
+    PRODUCT_OUT_OF_STOCK
+} = require('../utils/errorMessages');
 
 const cartDAO = new CartDAO();
 const productDAO = new ProductDAO();
@@ -12,81 +19,84 @@ const cartController = {
         try {
             const userId = req.body.userId;
             if (!userId) {
-                return res.status(400).send("ID de usuario requerido");
+                throw new Error(INVALID_REQUEST.message);
             }
             const newCart = await cartDAO.createCart(userId);
             res.cookie('cartId', newCart._id.toString());
             res.status(201).json(newCart);
         } catch (error) {
-            res.status(500).send("Error al crear el carrito: " + error.message);
+            error.statusCode = error.statusCode || 500;
+            res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
 
     getCartById: async (req, res) => {
-        const { cid } = req.params;
-        if (!mongoose.Types.ObjectId.isValid(cid)) {
-            return res.status(400).send('ID de carrito no válido');
-        }
         try {
+            const { cid } = req.params;
+            if (!mongoose.Types.ObjectId.isValid(cid)) {
+                throw new Error(INVALID_REQUEST.message);
+            }
             const cart = await cartDAO.getCartById(cid);
             if (!cart) {
-                return res.status(404).send('Carrito no encontrado');
+                throw new Error(CART_NOT_FOUND.message);
             }
             res.json(cart);
         } catch (error) {
-            res.status(500).send("Error al recuperar el carrito: " + error.message);
+            error.statusCode = error.statusCode || 500;
+            res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
 
     addProductToCart: async (req, res) => {
-        const { cid } = req.params;
-        const { productId, quantity } = req.body;
-    
-        console.log(`Carrito ID: ${cid}, Producto ID: ${productId}, Cantidad: ${quantity}`);
-    
-        if (!mongoose.Types.ObjectId.isValid(cid) || !mongoose.Types.ObjectId.isValid(productId)) {
-            return res.status(400).send('ID de carrito o producto no válido');
-        }
-    
         try {
+            const { cid, productId, quantity } = req.body;
+            if (!mongoose.Types.ObjectId.isValid(cid) || !mongoose.Types.ObjectId.isValid(productId)) {
+                throw new Error(INVALID_REQUEST.message);
+            }
             const updatedCart = await cartDAO.addProductToCart(cid, productId, quantity);
             if (!updatedCart) {
-                return res.status(404).send('Carrito no encontrado');
+                throw new Error(CART_NOT_FOUND.message);
             }
             res.json(updatedCart);
         } catch (error) {
-            console.error(`Error al agregar producto al carrito: ${error}`);
-            res.status(500).send("Error al agregar producto al carrito: " + error.message);
+            error.statusCode = error.statusCode || 500;
+            res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
 
     removeProductFromCart: async (req, res) => {
-        const { cid, pid } = req.params;
         try {
+            const { cid, pid } = req.params;
             const updatedCart = await cartDAO.removeProductFromCart(cid, pid);
+            if (!updatedCart) {
+                throw new Error(CART_NOT_FOUND.message);
+            }
             res.json(updatedCart);
         } catch (error) {
-            res.status(500).send("Error al remover producto del carrito: " + error.message);
+            error.statusCode = error.statusCode || 500;
+            res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
 
     updateCartProducts: async (req, res) => {
-        const { cid, products } = req.body;
         try {
+            const { cid, products } = req.body;
             const updatedCart = await cartDAO.updateCartProducts(cid, products);
             res.json(updatedCart);
         } catch (error) {
-            res.status(500).send("Error al actualizar productos en el carrito: " + error.message);
+            error.statusCode = error.statusCode || 500;
+            res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
 
     emptyCart: async (req, res) => {
-        const { cid } = req.params;
         try {
+            const { cid } = req.params;
             const emptiedCart = await cartDAO.emptyCart(cid);
             res.json(emptiedCart);
         } catch (error) {
-            res.status(500).send("Error al vaciar el carrito: " + error.message);
+            error.statusCode = error.statusCode || 500;
+            res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
 
@@ -94,7 +104,7 @@ const cartController = {
         try {
             const cart = await cartDAO.getCartById(req.params.cid);
             if (!cart) {
-                return res.status(404).send('Carrito no encontrado');
+                throw new Error(CART_NOT_FOUND.message);
             }
 
             let totalAmount = 0;
@@ -119,10 +129,9 @@ const cartController = {
             if (productsWithInsufficientStock.length === 0) {
                 const ticket = await ticketDAO.createTicket({
                     amount: totalAmount,
-                    purchaser: cart.user  // Asegúrate de que cart.user contenga el ID o correo del usuario
+                    purchaser: cart.user
                 });
 
-                // Incluir todos los datos del ticket en la respuesta
                 res.json({
                     success: true,
                     ticketId: ticket._id,
@@ -136,7 +145,8 @@ const cartController = {
             }
         } catch (error) {
             console.error('Purchase error:', error);
-            res.status(500).send('Failed to process purchase');
+            error.statusCode = error.statusCode || 500;
+            res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     }
 };
