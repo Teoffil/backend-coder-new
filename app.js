@@ -8,12 +8,14 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const UserDTO = require('./src/dto/UserDTO');
+const logger = require('./src/config/logger');  // Asegúrate de tener esta línea para importar el logger
 
 // Importación de routers y modelos
 const productsRouter = require('./src/api/products/productsRouter');
 const cartsRouter = require('./src/api/carts/cartsRouter');
 const authRouter = require('./src/api/auth/authRouter');
 const messageRoutes = require('./src/api/messages/messageRoutes');
+const generalRouter = require('./src/api/generalRouter');
 const ProductDAO = require('./src/dao/mongo/ProductDAO');
 const productManager = new ProductDAO(); // Creando una instancia de ProductDAO
 const User = require('./src/dao/models/UserSchema');
@@ -41,7 +43,12 @@ Handlebars.handlebars.registerHelper('totalPrice', function(products) {
 // Configuración de la base de datos
 require('dotenv').config();
 const connectDB = require('./database');
-connectDB();
+
+// Intenta conectar a la base de datos y maneja cualquier error fatal
+connectDB().catch(err => {
+    logger.fatal('Failed to connect to MongoDB', err);
+    process.exit(1);
+});
 
 // Creación de la aplicación Express y el servidor HTTP
 const app = express();
@@ -71,6 +78,12 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware para registrar cada solicitud HTTP
+app.use((req, res, next) => {
+    logger.http(`${req.method} ${req.url}`);
+    next();
+});
+
 // Configuración de las rutas estáticas
 app.use(express.static('public'));
 
@@ -80,6 +93,7 @@ apiRouter.use('/products', productsRouter);
 apiRouter.use('/carts', cartsRouter);
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/messages', messageRoutes);
+apiRouter.use('/test', generalRouter);
 app.use('/api', apiRouter);
 
 // Configuración de las rutas de la aplicación
@@ -120,7 +134,7 @@ app.get('/products', async (req, res) => {
             nextLink: `/products?page=${products.nextPage}`
         });
     } catch (error) {
-        console.error("Error fetching products: ", error);
+        logger.error("Error fetching products: ", error);
         res.status(500).send(error.message);
     }
 });
@@ -129,7 +143,7 @@ app.get('/products/:productId', async (req, res) => {
         const product = await productManager.getProductById(req.params.productId);
         res.render('productDetails', { product });
     } catch (error) {
-        console.error("Error fetching product details: ", error);
+        logger.error("Error fetching product details: ", error);
         res.status(500).send(error.message);
     }
 });
@@ -140,7 +154,7 @@ app.get('/current', async (req, res) => {
             const userDto = new UserDTO(user);  // Usando UserDTO para filtrar los datos
             res.json(userDto);
         } catch (error) {
-            console.error("Error fetching user: ", error);
+            logger.error("Error fetching user: ", error);
             res.status(500).send('Error fetching user');
         }
     } else {

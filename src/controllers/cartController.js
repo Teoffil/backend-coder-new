@@ -2,6 +2,7 @@ const CartDAO = require('../dao/mongo/CartDAO');
 const ProductDAO = require('../dao/mongo/ProductDAO');
 const TicketDAO = require('../dao/mongo/TicketDAO');
 const mongoose = require('mongoose');
+const logger = require('../config/logger'); 
 const {
     CART_NOT_FOUND,
     INVALID_REQUEST,
@@ -22,9 +23,11 @@ const cartController = {
                 throw new Error(INVALID_REQUEST.message);
             }
             const newCart = await cartDAO.createCart(userId);
+            logger.debug('New cart created', { userId });
             res.cookie('cartId', newCart._id.toString());
             res.status(201).json(newCart);
         } catch (error) {
+            logger.error('Error creating cart', { error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
@@ -40,8 +43,10 @@ const cartController = {
             if (!cart) {
                 throw new Error(CART_NOT_FOUND.message);
             }
+            logger.info('Cart retrieved successfully', { cid });
             res.json(cart);
         } catch (error) {
+            logger.error('Error retrieving cart', { cid: req.params.cid, error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
@@ -57,8 +62,10 @@ const cartController = {
             if (!updatedCart) {
                 throw new Error(CART_NOT_FOUND.message);
             }
+            logger.info('Product added to cart successfully', { cid, productId, quantity });
             res.json(updatedCart);
         } catch (error) {
+            logger.error('Error adding product to cart', { cid: req.body.cid, productId: req.body.productId, error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
@@ -71,8 +78,10 @@ const cartController = {
             if (!updatedCart) {
                 throw new Error(CART_NOT_FOUND.message);
             }
+            logger.info('Product removed from cart successfully', { cid, pid });
             res.json(updatedCart);
         } catch (error) {
+            logger.error('Error removing product from cart', { cid: req.params.cid, pid: req.params.pid, error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
@@ -82,8 +91,10 @@ const cartController = {
         try {
             const { cid, products } = req.body;
             const updatedCart = await cartDAO.updateCartProducts(cid, products);
+            logger.info('Cart products updated successfully', { cid });
             res.json(updatedCart);
         } catch (error) {
+            logger.error('Error updating cart products', { cid: req.body.cid, error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
@@ -93,8 +104,10 @@ const cartController = {
         try {
             const { cid } = req.params;
             const emptiedCart = await cartDAO.emptyCart(cid);
+            logger.info('Cart emptied successfully', { cid });
             res.json(emptiedCart);
         } catch (error) {
+            logger.error('Error emptying cart', { cid: req.params.cid, error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
@@ -132,6 +145,7 @@ const cartController = {
                     purchaser: cart.user
                 });
 
+                logger.info('Purchase successful', { cid: req.params.cid, ticketId: ticket._id });
                 res.json({
                     success: true,
                     ticketId: ticket._id,
@@ -141,10 +155,11 @@ const cartController = {
                     purchaser: ticket.purchaser
                 });
             } else {
+                logger.warn('Purchase failed due to insufficient stock', { cid: req.params.cid });
                 res.status(400).json({ success: false, unprocessedItems: productsWithInsufficientStock });
             }
         } catch (error) {
-            console.error('Purchase error:', error);
+            logger.error('Purchase error', { cid: req.params.cid, error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
