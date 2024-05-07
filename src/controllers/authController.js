@@ -159,7 +159,7 @@ const authController = {
             res.send('Password has been reset successfully.');
         } catch (error) {
             logger.error('Failed to reset password', { error: error.message });
-            res.status(500).send('Failed to reset password.');
+            res.render('linkExpired');
         }
     },
 
@@ -172,7 +172,7 @@ const authController = {
             res.status(500).send('Error al enviar el correo de prueba');
         }
     },
-
+    
     changeUserRole: async (req, res) => {
         const { id } = req.params;
         const { role } = req.body;
