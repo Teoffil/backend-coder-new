@@ -10,19 +10,19 @@ router.post('/', cartController.createCart);
 // Listar productos en un carrito específico
 router.get('/:cid', cartController.getCartById);
 
-// Agregar un producto al carrito
-router.post('/:cid/products', authorize(['usuario']), cartController.addProductToCart);
+// Agregar un producto al carrito con autorización de "usuario", "admin" o "premium"
+router.post('/:cartId/products/:productId', authorize(['usuario', 'admin', 'premium']), cartController.addProductToCart);
 
 // Eliminar un producto específico del carrito
-router.delete('/:cid/products/:pid', cartController.removeProductFromCart);
+router.delete('/:cartId/products/:productId', cartController.removeProductFromCart);
 
 // Actualizar el carrito con un arreglo de productos
-router.put('/:cid', cartController.updateCartProducts);
+router.put('/:cartId', cartController.updateCartProducts);
 
 // Vaciar el carrito (eliminar todos los productos)
-router.delete('/:cid', cartController.emptyCart);
+router.delete('/:cartId', cartController.emptyCart);
 
 // Ruta para finalizar la compra de un carrito
-router.post('/:cid/purchase', authorize(['usuario']), cartController.purchaseCart);
+router.post('/:cartId/purchase', authorize(['usuario', 'admin', 'premium']), cartController.purchaseCart);
 
 module.exports = router;

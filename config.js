@@ -8,4 +8,9 @@ module.exports = {
     githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
     JWT_SECRET: process.env.JWT_SECRET,
     port: process.env.PORT || 3000,
+    emailConfig: {
+        service: 'gmail',
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_APP_PASS,
+    }
 };

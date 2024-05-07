@@ -4,14 +4,9 @@ const UserDTO = require('../dto/UserDTO');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const { adminEmail, adminPassword, JWT_SECRET } = require('../../config');
-const logger = require('../config/logger'); 
-const {
-    DUPLICATE_USER,
-    INVALID_LOGIN,
-    UNAUTHORIZED,
-    USER_NOT_FOUND,
-    INTERNAL_SERVER_ERROR
-} = require('../utils/errorMessages');
+const logger = require('../config/logger');
+const { DUPLICATE_USER, INVALID_LOGIN, UNAUTHORIZED, USER_NOT_FOUND, INTERNAL_SERVER_ERROR } = require('../utils/errorMessages');
+const { sendResetEmail, sendTestEmail } = require('../utils/emailService');
 
 const userDAO = new UserDAO();
 const cartDAO = new CartDAO();
@@ -73,7 +68,7 @@ const authController = {
                 email,
                 password,
                 age,
-                role: 'usuario'
+                role: 'user'
             });
             if (!newUser) {
                 logger.error('Failed to create a new user');
@@ -115,6 +110,83 @@ const authController = {
             res.status(error.statusCode).json({ message: error.message });
         }
     },
+
+    requestPasswordReset: async (req, res) => {
+        try {
+            const user = await userDAO.getUserByEmail(req.body.email);
+            if (!user) {
+                return res.status(404).send('No user found with that email address.');
+            }
+            const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
+            await sendResetEmail(user.email, token);
+            logger.info('Password reset email sent successfully', { email: user.email });
+            res.send('Password reset email sent.');
+        } catch (error) {
+            logger.error('Failed to send password reset email', { error: error.message });
+            res.status(500).send('Failed to send password reset email.');
+        }
+    },
+
+    showResetForm: async (req, res) => {
+        const { token } = req.params;
+        try {
+            const decoded = jwt.verify(token, JWT_SECRET);
+            res.render('resetPassword', { token });
+        } catch (error) {
+            res.render('linkExpired');
+        }
+    },
+
+    resetPassword: async (req, res) => {
+        const { token } = req.params;
+        const { password } = req.body;
+        try {
+            const decoded = jwt.verify(token, JWT_SECRET);
+            const user = await userDAO.getUserById(decoded.id);
+            if (await user.comparePassword(password)) {
+                return res.status(400).send('New password cannot be the same as the old password.');
+            }
+            user.password = password;
+            await user.save();
+            res.send('Password has been reset successfully.');
+        } catch (error) {
+            logger.error('Failed to reset password', { error: error.message });
+            res.status(500).send('Failed to reset password.');
+        }
+    },
+
+    sendTestMail: async (req, res) => {
+        try {
+            await sendTestEmail('correo_destino@example.com');
+            res.send('Correo de prueba enviado con éxito!');
+        } catch (error) {
+            logger.error('Error al enviar el correo de prueba:', error);
+            res.status(500).send('Error al enviar el correo de prueba');
+        }
+    },
+    
+    changeUserRole: async (req, res) => {
+        const { id } = req.params;
+        const { role } = req.body;
+        try {
+            const validRoles = ['user', 'admin', 'premium'];
+            if (!validRoles.includes(role)) {
+                return res.status(400).json({ message: 'Invalid role specified.' });
+            }
+
+            const user = await userDAO.getUserById(id);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found.' });
+            }
+
+            user.role = role;
+            await user.save();
+            res.json({ message: 'User role updated successfully.' });
+        } catch (error) {
+            logger.error('Failed to change user role', { error: error.message });
+            res.status(500).json({ message: 'Failed to change user role.' });
+        }
+    }
 };
 
 module.exports = authController;

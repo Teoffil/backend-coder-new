@@ -1,0 +1,7 @@
+{"error":"User already exists.","level":"error","message":"Registration error","timestamp":"2024-05-06T21:51:16.031Z"}
+{"error":"Invalid username or password.","level":"error","message":"Login error","timestamp":"2024-05-06T22:06:50.845Z"}
+{"error":"jwt expired","level":"error","message":"Failed to reset password","timestamp":"2024-05-06T23:21:00.857Z"}
+{"error":"Invalid username or password.","level":"error","message":"Login error","timestamp":"2024-05-06T23:31:02.488Z"}
+{"error":"Cannot read properties of undefined (reading 'toString')","level":"error","message":"Failed to delete product","productId":"66398ed37b152fa4a18030dd","timestamp":"2024-05-07T02:15:55.080Z"}
+{"error":"Cannot read properties of undefined (reading 'toString')","level":"error","message":"Failed to delete product","productId":"66398f99b78d02c3648b4b1e","timestamp":"2024-05-07T02:19:10.928Z"}
+{"error":"Product not found.","level":"error","message":"Failed to delete product","productId":"663994e477dfbc2b92509422","timestamp":"2024-05-07T02:42:36.019Z"}

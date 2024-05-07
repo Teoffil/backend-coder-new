@@ -3,6 +3,7 @@ const passport = require('passport');
 const authController = require('../../controllers/authController');
 const UserDTO = require('../../dto/UserDTO');
 const User = require('../../dao/models/UserSchema');
+const { authorize } = require('../../middleware/authorization');
 const router = express.Router();
 
 // Login
@@ -27,7 +28,7 @@ router.get('/github', passport.authenticate('github'));
 // Callback de la autenticación de GitHub
 router.get('/github/callback', passport.authenticate('github', { failureRedirect: '/login' }), (req, res) => {
     req.session.userId = req.user._id;
-    req.session.role = req.user.role || 'usuario';
+    req.session.role = req.user.role || 'user';
     res.redirect('/products');
 });
 
@@ -39,12 +40,23 @@ router.get('/current', async (req, res) => {
             const userDto = new UserDTO(user);
             res.json(userDto);
         } catch (error) {
-            console.error("Error fetching user: ", error);
+            console.error('Error fetching user:', error);
             res.status(500).send('Error fetching user');
         }
     } else {
         res.status(401).json({ message: 'No user logged in' });
     }
 });
+
+// Rutas para recuperación de contraseña
+router.post('/request-reset', authController.requestPasswordReset);
+router.get('/reset-password/:token', authController.showResetForm);
+router.post('/reset-password/:token', authController.resetPassword);
+
+// Ruta para enviar un correo de prueba
+router.get('/mail', authController.sendTestMail);
+
+// Ruta cambio de rol
+router.put('/role/:id', authorize(['admin']), authController.changeUserRole);
 
 module.exports = router;

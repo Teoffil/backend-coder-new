@@ -1,6 +1,7 @@
+// src/controllers/productController.js
 const ProductDAO = require('../dao/mongo/ProductDAO');
 const ProductDTO = require('../dto/ProductDTO');
-const logger = require('../config/logger'); 
+const logger = require('../config/logger');
 const {
     PRODUCT_NOT_FOUND,
     INTERNAL_SERVER_ERROR,
@@ -20,8 +21,8 @@ const productController = {
             }
             const productDTOs = products.docs.map(product => new ProductDTO(product));
             res.render('products', {
-                products: productDTOs, // Send DTOs instead of raw data
-                user: req.user,
+                products: productDTOs, // Enviar DTOs en lugar de datos sin procesar
+                user: req.user
             });
             logger.info('Products retrieved successfully');
         } catch (error) {
@@ -31,28 +32,61 @@ const productController = {
     },
 
     addProduct: async (req, res) => {
-        logger.debug("Received data for new product:", req.body);
+        logger.debug('Received data for new product:', JSON.stringify(req.body, null, 2));
+        const { title, description, price, thumbnail, code, stock } = req.body;
+        const { role, id, email } = req.user;
+
         try {
-            if (!req.body.name || !req.body.price) {
+            if (!title || !price) {
                 throw new Error(INVALID_PRODUCT_DATA.message);
             }
-            const savedProduct = await productDAO.addProduct(req.body);
-            logger.info("Product added successfully", { productId: savedProduct._id });
+
+            // Verificar permisos para crear el producto
+            if (role !== 'admin' && role !== 'premium') {
+                return res.status(403).json({ message: 'Only admin or premium users can create products.' });
+            }
+
+            const newProduct = {
+                title,
+                description,
+                price,
+                thumbnail,
+                code,
+                stock,
+                owner: role === 'admin' ? null : id // Establecer el dueño correctamente
+            };
+
+            logger.debug('New product data:', JSON.stringify(newProduct, null, 2));
+
+            const savedProduct = await productDAO.addProduct(newProduct);
+            logger.info('Product added successfully', { productId: savedProduct._id });
             res.status(201).json(savedProduct);
         } catch (error) {
-            logger.error("Error adding product", { error: error.message });
+            logger.error('Error adding product', { error: error.message });
             res.status(error.statusCode || 500).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
 
     updateProduct: async (req, res) => {
         const { id } = req.params;
+        const { role, _id } = req.user;
+        const updateFields = req.body;
+
         try {
-            const updatedProduct = await productDAO.updateProduct(id, req.body);
-            if (!updatedProduct) {
+            const product = await productDAO.getProductById(id);
+            if (!product) {
                 throw new Error(PRODUCT_NOT_FOUND.message);
             }
-            const productDTO = new ProductDTO(updatedProduct);
+
+            // Verificar permisos para actualizar el producto
+            if (role !== 'admin' && product.owner && !product.owner.equals(_id)) {
+                return res.status(403).json({ message: 'You can only update your own products.' });
+            }
+
+            Object.assign(product, updateFields);
+            await product.save();
+
+            const productDTO = new ProductDTO(product);
             res.json(productDTO);
             logger.info('Product updated successfully', { productId: id });
         } catch (error) {
@@ -63,18 +97,40 @@ const productController = {
 
     deleteProduct: async (req, res) => {
         const { id } = req.params;
+        const { role, _id } = req.user;
+
         try {
-            const result = await productDAO.deleteProduct(id);
-            if (!result) {
+            const product = await productDAO.getProductById(id);
+            if (!product) {
                 throw new Error(PRODUCT_NOT_FOUND.message);
             }
-            res.send('Producto eliminado');
+
+            // Verificar permisos para eliminar el producto
+            logger.debug('Checking permissions to delete product:', {
+                productId: id,
+                productOwner: product.owner,
+                userId: _id,
+                role: role
+            });
+
+            if (role !== 'admin' && product.owner && !product.owner.equals(_id)) {
+                logger.warn('Unauthorized attempt to delete product', {
+                    productId: id,
+                    productOwner: product.owner,
+                    userId: _id,
+                    userRole: role
+                });
+                return res.status(403).json({ message: 'You can only delete your own products.' });
+            }
+
+            await productDAO.deleteProduct(id);
+            res.send('Product deleted successfully');
             logger.info('Product deleted successfully', { productId: id });
         } catch (error) {
             logger.error('Failed to delete product', { productId: id, error: error.message });
             res.status(error.statusCode || 500).send(error.message || PRODUCT_NOT_FOUND.message);
         }
-    },
+    }
 };
 
 module.exports = productController;

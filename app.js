@@ -8,7 +8,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const UserDTO = require('./src/dto/UserDTO');
-const logger = require('./src/config/logger');  // Asegúrate de tener esta línea para importar el logger
+const logger = require('./src/config/logger'); // Importar el logger
 
 // Importación de routers y modelos
 const productsRouter = require('./src/api/products/productsRouter');
@@ -151,7 +151,7 @@ app.get('/current', async (req, res) => {
     if (req.session.userId) {
         try {
             const user = await User.findById(req.session.userId);
-            const userDto = new UserDTO(user);  // Usando UserDTO para filtrar los datos
+            const userDto = new UserDTO(user); // Usando UserDTO para filtrar los datos
             res.json(userDto);
         } catch (error) {
             logger.error("Error fetching user: ", error);
@@ -160,6 +160,17 @@ app.get('/current', async (req, res) => {
     } else {
         res.status(401).send('No user is currently logged in.');
     }
+});
+
+// Ruta para el formulario de restablecimiento de contraseña
+app.get('/reset-password/:token', (req, res) => {
+    const { token } = req.params;
+    res.render('resetPassword', { token });
+});
+
+// Ruta para indicar que el enlace ha expirado
+app.get('/link-expired', (req, res) => {
+    res.render('linkExpired');
 });
 
 //final de todas las rutas

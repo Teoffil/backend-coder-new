@@ -17,16 +17,16 @@ router.use(async (req, res, next) => {
 // Listar todos los productos
 router.get('/', productController.getAllProducts);
 
-// Agregar un nuevo producto con autorización de administrador
-router.post('/', authorize('admin'), productController.addProduct);
+// Agregar un nuevo producto con autorización de "premium" o "admin"
+router.post('/', authorize(['admin', 'premium']), productController.addProduct);
 
-// Actualizar un producto por ID con autorización de administrador
-router.put('/:id', authorize('admin'), productController.updateProduct);
+// Actualizar un producto por ID con autorización de "premium" o "admin"
+router.put('/:id', authorize(['admin', 'premium']), productController.updateProduct);
 
-// Eliminar un producto por ID con autorización de administrador
-router.delete('/:id', authorize('admin'), productController.deleteProduct);
+// Eliminar un producto por ID con autorización de "premium" o "admin"
+router.delete('/:id', authorize(['admin', 'premium']), productController.deleteProduct);
 
-//mocking
+// Mocking de productos
 router.get('/mockingproducts', (req, res) => {
     res.json(generateProducts(100));
 });

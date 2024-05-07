@@ -2,7 +2,7 @@ const CartDAO = require('../dao/mongo/CartDAO');
 const ProductDAO = require('../dao/mongo/ProductDAO');
 const TicketDAO = require('../dao/mongo/TicketDAO');
 const mongoose = require('mongoose');
-const logger = require('../config/logger'); 
+const logger = require('../config/logger');
 const {
     CART_NOT_FOUND,
     INVALID_REQUEST,
@@ -53,61 +53,69 @@ const cartController = {
     },
 
     addProductToCart: async (req, res) => {
+        const { cartId, productId } = req.params;
+        const { role, email } = req.user;
+
         try {
-            const { cid, productId, quantity } = req.body;
-            if (!mongoose.Types.ObjectId.isValid(cid) || !mongoose.Types.ObjectId.isValid(productId)) {
-                throw new Error(INVALID_REQUEST.message);
+            const product = await productDAO.getProductById(productId);
+            if (!product) {
+                return res.status(404).json({ message: 'Product not found.' });
             }
-            const updatedCart = await cartDAO.addProductToCart(cid, productId, quantity);
+
+            if (role === 'premium' && product.owner === email) {
+                return res.status(403).json({ message: 'You cannot add your own products to your cart.' });
+            }
+
+            const updatedCart = await cartDAO.addProductToCart(cartId, productId, 1);
             if (!updatedCart) {
                 throw new Error(CART_NOT_FOUND.message);
             }
-            logger.info('Product added to cart successfully', { cid, productId, quantity });
+            logger.info('Product added to cart successfully', { cartId, productId });
             res.json(updatedCart);
         } catch (error) {
-            logger.error('Error adding product to cart', { cid: req.body.cid, productId: req.body.productId, error: error.message });
+            logger.error('Error adding product to cart', { cartId, productId, error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
 
     removeProductFromCart: async (req, res) => {
+        const { cartId, productId } = req.params;
         try {
-            const { cid, pid } = req.params;
-            const updatedCart = await cartDAO.removeProductFromCart(cid, pid);
+            const updatedCart = await cartDAO.removeProductFromCart(cartId, productId);
             if (!updatedCart) {
                 throw new Error(CART_NOT_FOUND.message);
             }
-            logger.info('Product removed from cart successfully', { cid, pid });
+            logger.info('Product removed from cart successfully', { cartId, productId });
             res.json(updatedCart);
         } catch (error) {
-            logger.error('Error removing product from cart', { cid: req.params.cid, pid: req.params.pid, error: error.message });
+            logger.error('Error removing product from cart', { cartId, productId, error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
 
     updateCartProducts: async (req, res) => {
+        const { cartId, products } = req.body;
         try {
-            const { cid, products } = req.body;
-            const updatedCart = await cartDAO.updateCartProducts(cid, products);
-            logger.info('Cart products updated successfully', { cid });
+            const updatedCart = await cartDAO.updateCartProducts(cartId, products);
+            logger.info('Cart products updated successfully', { cartId });
             res.json(updatedCart);
         } catch (error) {
-            logger.error('Error updating cart products', { cid: req.body.cid, error: error.message });
+            logger.error('Error updating cart products', { cartId, error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
 
     emptyCart: async (req, res) => {
+        const { cartId } = req.params;
         try {
-            const { cid } = req.params;
-            const emptiedCart = await cartDAO.emptyCart(cid);
-            logger.info('Cart emptied successfully', { cid });
+            const emptiedCart = await cartDAO.emptyCart(cartId);
+            logger.info('Cart emptied successfully', { cartId });
             res.json(emptiedCart);
         } catch (error) {
-            logger.error('Error emptying cart', { cid: req.params.cid, error: error.message });
+            logger.error('Error emptying cart', { cartId, error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
@@ -115,7 +123,7 @@ const cartController = {
 
     purchaseCart: async (req, res) => {
         try {
-            const cart = await cartDAO.getCartById(req.params.cid);
+            const cart = await cartDAO.getCartById(req.params.cartId);
             if (!cart) {
                 throw new Error(CART_NOT_FOUND.message);
             }
@@ -145,7 +153,7 @@ const cartController = {
                     purchaser: cart.user
                 });
 
-                logger.info('Purchase successful', { cid: req.params.cid, ticketId: ticket._id });
+                logger.info('Purchase successful', { cartId: req.params.cartId, ticketId: ticket._id });
                 res.json({
                     success: true,
                     ticketId: ticket._id,
@@ -155,11 +163,11 @@ const cartController = {
                     purchaser: ticket.purchaser
                 });
             } else {
-                logger.warn('Purchase failed due to insufficient stock', { cid: req.params.cid });
+                logger.warn('Purchase failed due to insufficient stock', { cartId: req.params.cartId });
                 res.status(400).json({ success: false, unprocessedItems: productsWithInsufficientStock });
             }
         } catch (error) {
-            logger.error('Purchase error', { cid: req.params.cid, error: error.message });
+            logger.error('Purchase error', { cartId: req.params.cartId, error: error.message });
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
