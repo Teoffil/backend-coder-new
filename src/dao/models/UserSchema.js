@@ -1,3 +1,4 @@
+// src/dao/models/UserSchema.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -10,18 +11,18 @@ const UserSchema = new mongoose.Schema({
     cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
     role: {
         type: String,
-        enum: ['usuario', 'admin', 'premium'],
-        default: 'usuario'
+        enum: ['user', 'admin', 'premium'],
+        default: 'user'
     }
 });
 
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function (next) {
     if (!this.isModified('password')) return next();
     this.password = bcrypt.hashSync(this.password, 10);
     next();
 });
 
-UserSchema.methods.comparePassword = function(password) {
+UserSchema.methods.comparePassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
 

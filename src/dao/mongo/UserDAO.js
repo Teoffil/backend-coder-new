@@ -1,7 +1,9 @@
+// src/dao/mongo/UserDAO.js
 const User = require('../models/UserSchema');
+const bcrypt = require('bcryptjs');
 
 class UserDAO {
-    constructor() {}
+    constructor() { }
 
     // Método para crear un nuevo usuario
     async createUser(userData) {
@@ -17,7 +19,7 @@ class UserDAO {
 
     // Método para obtener un usuario por correo electrónico
     async getUserByEmail(email) {
-        return await User.findOne({ email: email });
+        return await User.findOne({ email });
     }
 
     // Método para actualizar un usuario
@@ -37,7 +39,7 @@ class UserDAO {
 
     // Método para verificar las credenciales de un usuario
     async verifyCredentials(email, password) {
-        const user = await User.findOne({ email: email });
+        const user = await User.findOne({ email });
         if (!user) {
             return null; // o manejar como error según tu lógica de negocio
         }
@@ -45,6 +47,18 @@ class UserDAO {
         if (!isMatch) {
             return null; // o manejar como error según tu lógica de negocio
         }
+        return user;
+    }
+
+    // Método para actualizar el rol del usuario
+    async updateUserRole(userId, role) {
+        const user = await User.findById(userId);
+        if (!user) {
+            return null;
+        }
+
+        user.role = role;
+        await user.save();
         return user;
     }
 }

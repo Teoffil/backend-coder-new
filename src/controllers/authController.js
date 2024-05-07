@@ -174,14 +174,13 @@ const authController = {
                 return res.status(400).json({ message: 'Invalid role specified.' });
             }
 
-            const user = await userDAO.getUserById(id);
-            if (!user) {
+            const updatedUser = await userDAO.updateUserRole(id, role);
+
+            if (!updatedUser) {
                 return res.status(404).json({ message: 'User not found.' });
             }
 
-            user.role = role;
-            await user.save();
-            res.json({ message: 'User role updated successfully.' });
+            res.json({ message: 'User role updated successfully.', user: updatedUser });
         } catch (error) {
             logger.error('Failed to change user role', { error: error.message });
             res.status(500).json({ message: 'Failed to change user role.' });
