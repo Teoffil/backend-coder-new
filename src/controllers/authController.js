@@ -11,11 +11,19 @@ const { sendResetEmail, sendTestEmail } = require('../utils/emailService');
 const userDAO = new UserDAO();
 const cartDAO = new CartDAO();
 
+const generateJWT = (user) => {
+    return jwt.sign({
+        id: user._id,
+        email: user.email,
+        role: user.role
+    }, JWT_SECRET, { expiresIn: '1h' });
+};
+
 const authController = {
     login: async (req, res) => {
         try {
             if (req.body.email === adminEmail && req.body.password === adminPassword) {
-                const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '1h' });
+                const token = generateJWT({ _id: 'admin', email: adminEmail, role: 'admin' });
                 logger.info('Admin logged in successfully');
                 return res.json({ token });
             }
@@ -28,8 +36,8 @@ const authController = {
                 throw error;
             }
 
-            let cart = await cartDAO.createCart(user._id);
-            const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+            const cart = await cartDAO.createCart(user._id);
+            const token = generateJWT(user);
             logger.info('User logged in successfully', { userId: user._id });
 
             res.json({ token, userId: user._id, cartId: cart._id });
@@ -42,7 +50,7 @@ const authController = {
     logout: (req, res) => {
         req.session.destroy(err => {
             if (err) {
-                logger.error('Logout failed', { error: err });
+                logger.error('Logout failed', { error });
                 return res.status(500).send('Failed to logout');
             }
             logger.info('User logged out successfully');
@@ -92,7 +100,7 @@ const authController = {
     githubAuth: passport.authenticate('github'),
 
     githubCallback: passport.authenticate('github', { failureRedirect: '/login' }, (req, res) => {
-        const token = jwt.sign({ id: req.user._id, role: req.user.role }, JWT_SECRET, { expiresIn: '1h' });
+        const token = generateJWT(req.user);
         logger.info('GitHub login successful', { userId: req.user._id });
         res.json({ token });
     }),
@@ -117,7 +125,7 @@ const authController = {
             if (!user) {
                 return res.status(404).send('No user found with that email address.');
             }
-            const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
+            const token = generateJWT(user);
             await sendResetEmail(user.email, token);
             logger.info('Password reset email sent successfully', { email: user.email });
             res.send('Password reset email sent.');
@@ -164,7 +172,7 @@ const authController = {
             res.status(500).send('Error al enviar el correo de prueba');
         }
     },
-    
+
     changeUserRole: async (req, res) => {
         const { id } = req.params;
         const { role } = req.body;

@@ -10,3 +10,5 @@
 {"error":"User validation failed: role: `user` is not a valid enum value for path `role`.","level":"error","message":"Failed to change user role","timestamp":"2024-05-07T18:45:24.639Z"}
 {"error":"User validation failed: role: `user` is not a valid enum value for path `role`.","level":"error","message":"Failed to change user role","timestamp":"2024-05-07T18:49:40.517Z"}
 {"error":"User validation failed: role: `user` is not a valid enum value for path `role`.","level":"error","message":"Failed to change user role","timestamp":"2024-05-07T18:49:52.201Z"}
+{"error":"Product validation failed: owner: Cast to ObjectId failed for value \"ffmateo98@gmail.com\" (type string) at path \"owner\" because of \"BSONError\"","level":"error","message":"Error adding product","timestamp":"2024-05-07T19:46:44.595Z"}
+{"error":"product.owner.equals is not a function","level":"error","message":"Failed to delete product","productId":"663a85c293fd1e8948238752","timestamp":"2024-05-07T19:49:34.385Z"}

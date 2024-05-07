@@ -9,7 +9,7 @@ const ProductSchema = new mongoose.Schema({
     thumbnail: String,
     code: String,
     stock: Number,
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null }
+    owner: { type: String, default: null }
 });
 
 ProductSchema.plugin(mongoosePaginate);

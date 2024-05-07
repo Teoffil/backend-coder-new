@@ -34,7 +34,7 @@ const productController = {
     addProduct: async (req, res) => {
         logger.debug('Received data for new product:', JSON.stringify(req.body, null, 2));
         const { title, description, price, thumbnail, code, stock } = req.body;
-        const { role, _id, email } = req.user;
+        const { role, email } = req.user;
 
         try {
             if (!title || !price) {
@@ -53,7 +53,7 @@ const productController = {
                 thumbnail,
                 code,
                 stock,
-                owner: role === 'admin' ? null : _id // Establecer el dueño correctamente
+                owner: role === 'admin' ? null : email // Asignar el correo electrónico como dueño
             };
 
             logger.debug('New product data:', JSON.stringify(newProduct, null, 2));
@@ -69,7 +69,7 @@ const productController = {
 
     updateProduct: async (req, res) => {
         const { id } = req.params;
-        const { role, _id } = req.user;
+        const { role, email } = req.user;
         const updateFields = req.body;
 
         try {
@@ -79,7 +79,7 @@ const productController = {
             }
 
             // Verificar permisos para actualizar el producto
-            if (role !== 'admin' && product.owner && !product.owner.equals(_id)) {
+            if (role !== 'admin' && product.owner && product.owner !== email) {
                 return res.status(403).json({ message: 'You can only update your own products.' });
             }
 
@@ -97,7 +97,7 @@ const productController = {
 
     deleteProduct: async (req, res) => {
         const { id } = req.params;
-        const { role, _id } = req.user;
+        const { role, email } = req.user;
 
         try {
             const product = await productDAO.getProductById(id);
@@ -109,15 +109,15 @@ const productController = {
             logger.debug('Checking permissions to delete product:', {
                 productId: id,
                 productOwner: product.owner,
-                userId: _id,
+                userEmail: email,
                 role: role
             });
 
-            if (role !== 'admin' && product.owner && !product.owner.equals(_id)) {
+            if (role !== 'admin' && product.owner && product.owner !== email) {
                 logger.warn('Unauthorized attempt to delete product', {
                     productId: id,
                     productOwner: product.owner,
-                    userId: _id,
+                    userEmail: email,
                     userRole: role
                 });
                 return res.status(403).json({ message: 'You can only delete your own products.' });
