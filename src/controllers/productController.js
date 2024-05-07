@@ -21,7 +21,7 @@ const productController = {
             }
             const productDTOs = products.docs.map(product => new ProductDTO(product));
             res.render('products', {
-                products: productDTOs, // Enviar DTOs en lugar de datos sin procesar
+                products: productDTOs,
                 user: req.user
             });
             logger.info('Products retrieved successfully');
@@ -34,7 +34,7 @@ const productController = {
     addProduct: async (req, res) => {
         logger.debug('Received data for new product:', JSON.stringify(req.body, null, 2));
         const { title, description, price, thumbnail, code, stock } = req.body;
-        const { role, id, email } = req.user;
+        const { role, _id, email } = req.user;
 
         try {
             if (!title || !price) {
@@ -53,7 +53,7 @@ const productController = {
                 thumbnail,
                 code,
                 stock,
-                owner: role === 'admin' ? null : id // Establecer el dueño correctamente
+                owner: role === 'admin' ? null : _id // Establecer el dueño correctamente
             };
 
             logger.debug('New product data:', JSON.stringify(newProduct, null, 2));
