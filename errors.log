@@ -14,3 +14,4 @@
 {"error":"product.owner.equals is not a function","level":"error","message":"Failed to delete product","productId":"663a85c293fd1e8948238752","timestamp":"2024-05-07T19:49:34.385Z"}
 {"error":"jwt expired","level":"error","message":"Failed to reset password","timestamp":"2024-05-07T20:09:54.078Z"}
 {"error":"jwt expired","level":"error","message":"Failed to reset password","timestamp":"2024-05-07T20:19:39.134Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-07T20:24:29.011Z"}

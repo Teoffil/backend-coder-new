@@ -9,6 +9,8 @@ const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const UserDTO = require('./src/dto/UserDTO');
 const logger = require('./src/config/logger'); // Importar el logger
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swaggerConfig');
 
 // Importación de routers y modelos
 const productsRouter = require('./src/api/products/productsRouter');
@@ -86,6 +88,9 @@ app.use((req, res, next) => {
 
 // Configuración de las rutas estáticas
 app.use(express.static('public'));
+
+// Configuración de Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Configuración de las rutas de la API usando un router común
 const apiRouter = express.Router();
