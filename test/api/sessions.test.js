@@ -9,7 +9,7 @@ chai.use(chaiHttp);
 describe('Sessions', () => {
     describe('POST /api/auth/login', () => {
         it('should login a user and return a token', done => {
-            const userCredentials = { email: 'ffmateo98@gmail.com', password: 'ffmateo99' };  // Use valid credentials
+            const userCredentials = { email:process.env.USER_EMAIL, password: process.env.USER_PASSWORD };  // Use valid credentials
             chai.request(server)
                 .post('/api/auth/login')
                 .send(userCredentials)

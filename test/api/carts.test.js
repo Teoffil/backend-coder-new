@@ -12,7 +12,10 @@ describe('Carts', () => {
     before((done) => {
         chai.request(app)
             .post('/api/auth/login')
-            .send({ email: 'coder1234@gmail.com', password: 'coder1234' })
+            .send({
+                email: process.env.USER_EMAIL, // Usar la variable de entorno
+                password: process.env.USER_PASSWORD // Usar la variable de entorno
+            })
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 token = res.body.token;

@@ -1,4 +1,5 @@
 // test/api/products.test.js
+require('dotenv').config();
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const expect = chai.expect;
@@ -14,7 +15,10 @@ describe('Products API', () => {
     before(done => {
         chai.request(server)
             .post('/api/auth/login')
-            .send({ email: 'adminCoder@coder.com', password: 'adminCod3r123' })
+            .send({
+                email: process.env.ADMIN_EMAIL,
+                password: process.env.ADMIN_PASSWORD 
+            })
             .end((err, res) => {
                 token = res.body.token;
                 done();
