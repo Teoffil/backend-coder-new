@@ -54,7 +54,6 @@ connectDB().catch(err => {
 
 // Creación de la aplicación Express y el servidor HTTP
 const app = express();
-const server = http.createServer(app);
 
 // Configuración de la sesión
 app.use(session({
@@ -181,5 +180,12 @@ app.get('/link-expired', (req, res) => {
 //final de todas las rutas
 app.use(errorHandler);
 
-// Iniciar el servidor
-server.listen(port, () => console.log(`Servidor corriendo en el puerto ${port}`));
+// Exportar la app para pruebas y no iniciar el servidor aquí si está siendo requerido como un módulo
+if (require.main === module) {
+    // Creación y ejecución del servidor HTTP solo si el archivo se ejecuta directamente
+    const server = http.createServer(app);
+    server.listen(port, () => console.log(`Servidor corriendo en el puerto ${port}`));
+} else {
+    // Exportar la aplicación para ser usada en tests u otros módulos
+    module.exports = app;
+}

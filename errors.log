@@ -15,3 +15,37 @@
 {"error":"jwt expired","level":"error","message":"Failed to reset password","timestamp":"2024-05-07T20:09:54.078Z"}
 {"error":"jwt expired","level":"error","message":"Failed to reset password","timestamp":"2024-05-07T20:19:39.134Z"}
 {"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-07T20:24:29.011Z"}
+{"error":"Invalid username or password.","level":"error","message":"Login error","timestamp":"2024-05-13T22:39:02.056Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-13T22:39:02.076Z"}
+{"cartId":"663f9f1a05594563193a57a4","error":"Carrito no encontrado","level":"error","message":"Error removing product from cart","productId":"65cfe3183786e9aac4585e0f","timestamp":"2024-05-13T22:39:02.165Z"}
+{"error":"Invalid username or password.","level":"error","message":"Login error","timestamp":"2024-05-13T22:39:02.227Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-13T22:39:02.241Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-13T22:39:02.258Z"}
+{"error":"Invalid username or password.","level":"error","message":"Login error","timestamp":"2024-05-13T22:56:33.453Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-13T22:56:33.467Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-13T22:56:33.481Z"}
+{"error":"Invalid username or password.","level":"error","message":"Login error","timestamp":"2024-05-13T23:00:14.968Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-13T23:00:14.975Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-13T23:00:14.982Z"}
+{"cartId":"66429a7ed28377fe930d1d06","error":"Carrito no encontrado","level":"error","message":"Error adding product to cart","productId":"65cfe3183786e9aac4585e12","timestamp":"2024-05-13T23:16:46.521Z"}
+{"cartId":"66429a7ed28377fe930d1d06","error":"Carrito no encontrado","level":"error","message":"Error removing product from cart","productId":"65cfe3183786e9aac4585e12","timestamp":"2024-05-13T23:16:46.569Z"}
+{"cartId":"66429a7ed28377fe930d1d06","error":"Carrito no encontrado","level":"error","message":"Error removing product from cart","productId":"65cfe3183786e9aac4585e12","timestamp":"2024-05-13T23:19:40.005Z"}
+{"error":"Product not found.","level":"error","message":"Failed to delete product","productId":"6639873dafdd21038a7f5584","timestamp":"2024-05-13T23:19:40.105Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-13T23:22:07.039Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-13T23:23:35.879Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-14T01:20:11.790Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-14T01:22:12.508Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-14T01:23:11.851Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-14T01:23:25.574Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-14T01:23:26.719Z"}
+{"error":{"message":"jwt malformed","name":"JsonWebTokenError"},"level":"error","message":"Unauthorized","timestamp":"2024-05-14T01:23:27.308Z"}
+{"cid":"6625350eee55b3a461eb5f28","error":"Cart not found.","level":"error","message":"Error retrieving cart","timestamp":"2024-05-14T01:41:55.592Z"}
+{"cid":"6642bc25dc0123081234b7c8","error":"Cart not found.","level":"error","message":"Error retrieving cart","timestamp":"2024-05-14T01:42:03.856Z"}
+{"error":"Product not found.","level":"error","message":"Failed to delete product","productId":"6639873dafdd21038a7f5584","timestamp":"2024-05-14T01:45:15.282Z"}
+{"error":"Product not found.","level":"error","message":"Failed to delete product","productId":"6639873dafdd21038a7f5584","timestamp":"2024-05-14T01:53:44.519Z"}
+{"cartId":"6642c1bedc0123081234b7e1","error":"Carrito no encontrado","level":"error","message":"Error adding product to cart","productId":"65cfe3183786e9aac4585e14","timestamp":"2024-05-14T01:55:20.979Z"}
+{"cartId":"6642c1bedc0123081234b7e1","error":"Carrito no encontrado","level":"error","message":"Error removing product from cart","productId":"65cfe3183786e9aac4585e14","timestamp":"2024-05-14T01:55:21.032Z"}
+{"cartId":"6642c1bedc0123081234b7e1","error":"Carrito no encontrado","level":"error","message":"Error adding product to cart","productId":"65cfe3183786e9aac4585e14","timestamp":"2024-05-14T02:13:34.848Z"}
+{"cartId":"6642c1bedc0123081234b7e1","error":"Carrito no encontrado","level":"error","message":"Error removing product from cart","productId":"65cfe3183786e9aac4585e14","timestamp":"2024-05-14T02:13:34.893Z"}
+{"error":"Product not found.","level":"error","message":"Failed to delete product","productId":"663989e2a3e05a44120f6985","timestamp":"2024-05-14T02:13:34.994Z"}
+{"error":"Product not found.","level":"error","message":"Failed to delete product","productId":"663989e2a3e05a44120f6985","timestamp":"2024-05-14T02:17:25.923Z"}
