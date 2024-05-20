@@ -18,6 +18,7 @@ const cartsRouter = require('./src/api/carts/cartsRouter');
 const authRouter = require('./src/api/auth/authRouter');
 const messageRoutes = require('./src/api/messages/messageRoutes');
 const generalRouter = require('./src/api/generalRouter');
+const usersRouter = require('./src/api/users/usersRouter');
 const ProductDAO = require('./src/dao/mongo/ProductDAO');
 const productManager = new ProductDAO(); // Creando una instancia de ProductDAO
 const User = require('./src/dao/models/UserSchema');
@@ -98,6 +99,7 @@ apiRouter.use('/carts', cartsRouter);
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/messages', messageRoutes);
 apiRouter.use('/test', generalRouter);
+apiRouter.use('/users', usersRouter);
 app.use('/api', apiRouter);
 
 // Configuración de las rutas de la aplicación

@@ -38,8 +38,12 @@ const authController = {
 
             const cart = await cartDAO.createCart(user._id);
             const token = generateJWT(user);
-            logger.info('User logged in successfully', { userId: user._id });
 
+            // Actualizar last_connection
+            user.last_connection = new Date();
+            await user.save();
+
+            logger.info('User logged in successfully', { userId: user._id });
             res.json({ token, userId: user._id, cartId: cart._id });
         } catch (error) {
             logger.error('Login error', { error: error.message });
@@ -47,16 +51,31 @@ const authController = {
         }
     },
 
-    logout: (req, res) => {
-        req.session.destroy(err => {
-            if (err) {
-                logger.error('Logout failed', { error });
-                return res.status(500).send('Failed to logout');
+    logout: async (req, res) => {
+        const { id } = req.user;
+        try {
+            const user = await userDAO.findById(id);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found.' });
             }
-            logger.info('User logged out successfully');
-            res.clearCookie('connect.sid');
-            res.send('Logged out');
-        });
+
+            // Actualizar last_connection
+            user.last_connection = new Date();
+            await user.save();
+
+            req.session.destroy(err => {
+                if (err) {
+                    logger.error('Logout failed', { error: err.message });
+                    return res.status(500).send('Failed to logout');
+                }
+                logger.info('User logged out successfully');
+                res.clearCookie('connect.sid');
+                res.send('Logged out');
+            });
+        } catch (error) {
+            logger.error('Failed to logout', { error: error.message });
+            res.status(500).json({ message: 'Failed to logout' });
+        }
     },
 
     register: async (req, res) => {

@@ -2,6 +2,11 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const DocumentSchema = new mongoose.Schema({
+    name: String,
+    reference: String
+});
+
 const UserSchema = new mongoose.Schema({
     first_name: String,
     last_name: String,
@@ -13,7 +18,9 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: ['user', 'admin', 'premium'],
         default: 'user'
-    }
+    },
+    documents: [DocumentSchema],
+    last_connection: Date
 });
 
 UserSchema.pre('save', function (next) {
