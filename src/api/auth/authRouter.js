@@ -10,7 +10,7 @@ const router = express.Router();
 router.post('/login', authController.login);
 
 // Logout
-router.get('/logout', authController.logout);
+router.post('/logout', authController.logout);
 
 // Mostrar formulario de registro
 router.get('/register', (req, res) => {

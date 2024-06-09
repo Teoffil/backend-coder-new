@@ -9,7 +9,7 @@ module.exports = {
     JWT_SECRET: process.env.JWT_SECRET,
     port: process.env.PORT || 3000,
     emailConfig: {
-        service: 'gmail',
+        service: process.env.EMAIL_SERVICE,
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_APP_PASS,
     }

@@ -1,4 +1,3 @@
-// src/middleware/authorization.js
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../../config');
 const logger = require('../config/logger');
@@ -38,6 +37,8 @@ const authorize = (roles = []) => {
                 }
 
                 req.user = decoded;
+                req.session.userId = decoded.id; // Guardar el ID del usuario en la sesión
+                req.session.role = decoded.role; // Guardar el rol del usuario en la sesión
                 next();
             });
         }

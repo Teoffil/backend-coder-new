@@ -24,6 +24,11 @@ const authController = {
         try {
             if (req.body.email === adminEmail && req.body.password === adminPassword) {
                 const token = generateJWT({ _id: 'admin', email: adminEmail, role: 'admin' });
+                
+                // Guardar la información del usuario admin en la sesión
+                req.session.userId = 'admin';
+                req.session.role = 'admin';
+                
                 logger.info('Admin logged in successfully');
                 return res.json({ token });
             }
@@ -43,6 +48,10 @@ const authController = {
             user.last_connection = new Date();
             await user.save();
 
+            // Guardar la información del usuario en la sesión
+            req.session.userId = user._id;
+            req.session.role = user.role;
+
             logger.info('User logged in successfully', { userId: user._id });
             res.json({ token, userId: user._id, cartId: cart._id });
         } catch (error) {
@@ -52,26 +61,55 @@ const authController = {
     },
 
     logout: async (req, res) => {
-        const { id } = req.user;
+        if (!req.session.userId) {
+            logger.warn('No user ID found in session');
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
+    
+        const userId = req.session.userId;
+        logger.info(`Attempting to log out user with ID: ${userId}`);
+    
         try {
-            const user = await userDAO.findById(id);
-            if (!user) {
-                return res.status(404).json({ message: 'User not found.' });
-            }
-
-            // Actualizar last_connection
-            user.last_connection = new Date();
-            await user.save();
-
-            req.session.destroy(err => {
-                if (err) {
-                    logger.error('Logout failed', { error: err.message });
-                    return res.status(500).send('Failed to logout');
+            if (userId === 'admin') {
+                // Manejo especial para el usuario administrador
+                req.session.destroy(err => {
+                    if (err) {
+                        logger.error('Failed to destroy session for admin', { error: err.message });
+                        return res.status(500).json({ message: 'Failed to logout' });
+                    }
+                    logger.info('Admin session destroyed successfully');
+                    res.clearCookie('connect.sid');
+                    res.json({ message: 'Logged out' });
+                });
+            } else {
+                const user = await userDAO.getUserById(userId);
+                if (!user) {
+                    logger.warn('User not found');
+                    return res.status(404).json({ message: 'User not found.' });
                 }
-                logger.info('User logged out successfully');
-                res.clearCookie('connect.sid');
-                res.send('Logged out');
-            });
+    
+                logger.info(`User found: ${JSON.stringify(user)}`);
+    
+                // Actualizar last_connection
+                try {
+                    user.last_connection = new Date();
+                    await user.save();
+                    logger.info('User last_connection updated');
+                } catch (updateError) {
+                    logger.error('Failed to update last_connection', { error: updateError.message });
+                    return res.status(500).json({ message: 'Failed to update last_connection' });
+                }
+    
+                req.session.destroy(err => {
+                    if (err) {
+                        logger.error('Failed to destroy session', { error: err.message });
+                        return res.status(500).json({ message: 'Failed to logout' });
+                    }
+                    logger.info('Session destroyed successfully');
+                    res.clearCookie('connect.sid');
+                    res.json({ message: 'Logged out' });
+                });
+            }
         } catch (error) {
             logger.error('Failed to logout', { error: error.message });
             res.status(500).json({ message: 'Failed to logout' });

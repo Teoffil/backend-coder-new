@@ -1,7 +1,8 @@
-// src/controllers/productController.js
 const ProductDAO = require('../dao/mongo/ProductDAO');
 const ProductDTO = require('../dto/ProductDTO');
+const User = require('../dao/models/UserSchema');
 const logger = require('../config/logger');
+const { sendProductDeletedEmail } = require('../utils/emailService');
 const {
     PRODUCT_NOT_FOUND,
     INTERNAL_SERVER_ERROR,
@@ -124,6 +125,13 @@ const productController = {
             }
 
             await productDAO.deleteProduct(id);
+
+            // Enviar correo si el usuario es premium
+            const user = await User.findOne({ email: product.owner });
+            if (user && user.role === 'premium') {
+                await sendProductDeletedEmail(user.email);
+            }
+
             res.send('Product deleted successfully');
             logger.info('Product deleted successfully', { productId: id });
         } catch (error) {

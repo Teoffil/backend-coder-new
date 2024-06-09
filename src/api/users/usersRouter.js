@@ -26,7 +26,10 @@ router.post('/:uid/documents', authorize(['user']), upload.fields([
     { name: 'comprobante_domicilio' },
     { name: 'comprobante_estado_cuenta' }
 ]), userController.uploadDocuments);
+router.get('/', authorize(['admin']), userController.getAllUsers);
+router.delete('/', authorize(['admin']), userController.deleteInactiveUsers);
+router.put('/:uid/role', authorize(['admin']), userController.changeUserRole);
+router.delete('/:uid', authorize(['admin']), userController.deleteUser);
 
 module.exports = router;
-
 

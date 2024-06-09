@@ -11,6 +11,7 @@ const UserDTO = require('./src/dto/UserDTO');
 const logger = require('./src/config/logger'); // Importar el logger
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/config/swaggerConfig');
+const path = require('path'); // Importar path
 
 // Importación de routers y modelos
 const productsRouter = require('./src/api/products/productsRouter');
@@ -22,6 +23,7 @@ const usersRouter = require('./src/api/users/usersRouter');
 const ProductDAO = require('./src/dao/mongo/ProductDAO');
 const productManager = new ProductDAO(); // Creando una instancia de ProductDAO
 const User = require('./src/dao/models/UserSchema');
+const Cart = require('./src/dao/models/CartSchema');
 const { port } = require('./config');
 const errorHandler = require('./src/middleware/errorHandler');
 
@@ -42,6 +44,9 @@ Handlebars.handlebars.registerHelper('totalPrice', function(products) {
         return total + (product.productId.price * product.quantity);
     }, 0);
 });
+Handlebars.handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
 
 // Configuración de la base de datos
 require('dotenv').config();
@@ -61,7 +66,8 @@ app.use(session({
     secret: 'mySecret',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI })
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+    cookie: { secure: false, maxAge: 3600000 } 
 }));
 
 // Configuración de Passport
@@ -86,11 +92,21 @@ app.use((req, res, next) => {
     next();
 });
 
-// Configuración de las rutas estáticas
-app.use(express.static('public'));
+// Configuración de archivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Configuración de Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Middleware para cargar el usuario y el carrito
+app.use(async (req, res, next) => {
+    if (req.session.userId) {
+        const user = await User.findById(req.session.userId).populate('cart');
+        req.user = user;
+        req.cartId = user.cart ? user.cart._id : null;
+    }
+    next();
+});
 
 // Configuración de las rutas de la API usando un router común
 const apiRouter = express.Router();
@@ -125,8 +141,8 @@ app.get('/products', async (req, res) => {
         if (req.session.role === 'admin') {
             user = { role: 'admin' };
         } else if (req.session.userId) {
-            user = await User.findById(req.session.userId);
-            user.cartId = req.session.cartId;
+            user = await User.findById(req.session.userId).populate('cart');
+            user.cartId = user.cart ? user.cart._id : null;
         }
         res.render('products', {
             products: products.docs,
@@ -177,6 +193,24 @@ app.get('/reset-password/:token', (req, res) => {
 // Ruta para indicar que el enlace ha expirado
 app.get('/link-expired', (req, res) => {
     res.render('linkExpired');
+});
+
+// Ruta para gestionar usuarios (solo accesible para administradores)
+app.get('/admin/users', async (req, res) => {
+    logger.debug('Ruta /admin/users accedida');
+    if (req.session.role === 'admin') {
+        logger.debug('Rol de usuario: admin');
+        try {
+            const users = await User.find({});
+            res.render('adminUsers', { users });
+        } catch (error) {
+            logger.error('Error fetching users:', error);
+            res.status(500).send('Error fetching users');
+        }
+    } else {
+        logger.warn('Acceso denegado: El usuario no es administrador');
+        res.status(403).send('Access denied');
+    }
 });
 
 //final de todas las rutas

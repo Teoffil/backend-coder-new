@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Lista de Productos</title>
@@ -10,10 +10,9 @@
         <p>Bienvenido {{user.email}}</p>
         <p>Rol: {{user.role}}</p>
         {{#eq user.role 'admin'}}
-            <!-- Opciones específicas del administrador aquí -->
             <p>Tienes funciones de administrador: adminCoder@coder.com</p>
         {{/eq}}
-        <button onclick="location.href='/api/auth/logout'">Logout</button>
+        <button id="logout-btn">Logout</button>
     {{else}}
         <button onclick="location.href='/register'">Registrarse</button>
         <button onclick="location.href='/login'">Iniciar Sesión</button>
@@ -24,48 +23,22 @@
                 <h2>{{this.title}}</h2>
                 <p>{{this.description}}</p>
                 <p>Precio: ${{this.price}}</p>
-                <!-- Opción para agregar al carrito -->
-                <button onclick="addToCart('{{this._id}}')">Agregar al Carrito</button>
-                <!-- Opción para ver detalles -->
+                <button class="add-to-cart-btn" data-product-id="{{this._id}}" data-cart-id="{{user.cartId}}">Agregar al Carrito</button>
                 <button onclick="location.href='/products/{{this._id}}'">Ver Detalles</button>
             </li>
         {{/each}}
     </ul>
-    <!-- Botón para ver el carrito -->
     {{#if user.cartId}}
         <a href="/carts/{{user.cartId}}">Ver carrito</a>
     {{else}}
         <a href="#">Carrito no disponible</a>
     {{/if}}
-    
-    <!-- Paginación -->
     {{#if prevPage}}
         <button onclick="location.href='/products?page={{prevPage}}'">Anterior</button>
     {{/if}}
     {{#if nextPage}}
         <button onclick="location.href='/products?page={{nextPage}}'">Siguiente</button>
     {{/if}}
-    <script>
-        function addToCart(productId) {
-            // Obtiene el ID del carrito del usuario desde la sesión o donde esté almacenado
-            const cartId = '{{user.cartId}}'; // Utiliza la variable handlebars para obtener el cartId dinámicamente
-            fetch(`/carts/${cartId}/products`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ productId: productId, quantity: 1 }) // Asumiendo que se agrega 1 unidad
-            })
-            .then(response => {
-                if(response.ok) {
-                    alert('Producto agregado al carrito');
-                } else {
-                    alert('Error al agregar el producto');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    </script>
-
+    <script src="/js/cart.js"></script>
 </body>
 </html>
