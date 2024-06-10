@@ -44,7 +44,7 @@ const cartController = {
                 throw new Error(CART_NOT_FOUND.message);
             }
             logger.info('Cart retrieved successfully', { cid });
-            res.json(cart);
+            res.render('cartDetails', { cart }); // Renderiza la vista cartDetails.handlebars con los datos del carrito
         } catch (error) {
             logger.error('Error retrieving cart', { cid: req.params.cid, error: error.message });
             error.statusCode = error.statusCode || 500;
@@ -54,28 +54,23 @@ const cartController = {
 
     addProductToCart: async (req, res) => {
         const { cartId, productId } = req.params;
-        const { role, email } = req.user;
 
         try {
-            const product = await productDAO.getProductById(productId);
-            if (!product) {
-                return res.status(404).json({ message: 'Product not found.' });
+            const cart = await cartDAO.getCartById(cartId);
+            if (!cart) {
+                return res.status(404).json({ message: 'Carrito no encontrado.' });
             }
 
-            if (role === 'premium' && product.owner === email) {
-                return res.status(403).json({ message: 'You cannot add your own products to your cart.' });
+            const product = await productDAO.getProductById(productId);
+            if (!product) {
+                return res.status(404).json({ message: 'Producto no encontrado.' });
             }
 
             const updatedCart = await cartDAO.addProductToCart(cartId, productId, 1);
-            if (!updatedCart) {
-                throw new Error(CART_NOT_FOUND.message);
-            }
-            logger.info('Product added to cart successfully', { cartId, productId });
             res.json(updatedCart);
         } catch (error) {
-            logger.error('Error adding product to cart', { cartId, productId, error: error.message });
-            error.statusCode = error.statusCode || 500;
-            res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
+            console.error('Error adding product to cart:', error);
+            res.status(500).json({ message: 'Error al agregar el producto al carrito.' });
         }
     },
 

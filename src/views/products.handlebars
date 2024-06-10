@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Lista de Productos</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <h1>Productos</h1>
@@ -29,7 +30,7 @@
         {{/each}}
     </ul>
     {{#if user.cartId}}
-        <a href="/carts/{{user.cartId}}">Ver carrito</a>
+        <a href="/api/carts/{{user.cartId}}">Ver carrito</a>
     {{else}}
         <a href="#">Carrito no disponible</a>
     {{/if}}
@@ -39,6 +40,6 @@
     {{#if nextPage}}
         <button onclick="location.href='/products?page={{nextPage}}'">Siguiente</button>
     {{/if}}
-    <script src="/js/cart.js"></script>
+    <script src="/js/products.js"></script>
 </body>
 </html>

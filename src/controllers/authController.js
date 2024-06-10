@@ -25,14 +25,13 @@ const authController = {
             if (req.body.email === adminEmail && req.body.password === adminPassword) {
                 const token = generateJWT({ _id: 'admin', email: adminEmail, role: 'admin' });
                 
-                // Guardar la información del usuario admin en la sesión
                 req.session.userId = 'admin';
                 req.session.role = 'admin';
                 
                 logger.info('Admin logged in successfully');
                 return res.json({ token });
             }
-
+    
             const user = await userDAO.getUserByEmail(req.body.email);
             if (!user || !await user.comparePassword(req.body.password)) {
                 logger.warn('Login attempt failed', { email: req.body.email });
@@ -40,20 +39,25 @@ const authController = {
                 error.statusCode = INVALID_LOGIN.statusCode;
                 throw error;
             }
-
-            const cart = await cartDAO.createCart(user._id);
+    
+            // Verificar si el usuario ya tiene un carrito asignado
+            let cart = await cartDAO.getCartById(user.cart);
+            if (!cart) {
+                cart = await cartDAO.createCart(user._id);
+                user.cart = cart._id;
+                await user.save();
+            }
+    
             const token = generateJWT(user);
-
-            // Actualizar last_connection
             user.last_connection = new Date();
             await user.save();
-
-            // Guardar la información del usuario en la sesión
+    
             req.session.userId = user._id;
             req.session.role = user.role;
-
+            req.session.cartId = user.cart;
+    
             logger.info('User logged in successfully', { userId: user._id });
-            res.json({ token, userId: user._id, cartId: cart._id });
+            res.json({ token, userId: user._id, cartId: user.cart });
         } catch (error) {
             logger.error('Login error', { error: error.message });
             res.status(error.statusCode || 500).send(error.message || INTERNAL_SERVER_ERROR.message);
@@ -126,7 +130,7 @@ const authController = {
                 error.statusCode = DUPLICATE_USER.statusCode;
                 throw error;
             }
-
+    
             const newUser = await userDAO.createUser({
                 first_name,
                 last_name,
@@ -139,13 +143,20 @@ const authController = {
                 logger.error('Failed to create a new user');
                 throw new Error(INTERNAL_SERVER_ERROR.message);
             }
-
+    
             const newCart = await cartDAO.createCart(newUser._id);
             if (!newCart) {
                 logger.error('Failed to create a cart for new user');
                 throw new Error(INTERNAL_SERVER_ERROR.message);
             }
-
+    
+            newUser.cart = newCart._id;
+            await newUser.save();
+    
+            req.session.userId = newUser._id;
+            req.session.role = newUser.role;
+            req.session.cartId = newUser.cart;
+    
             logger.info('User registered successfully', { userId: newUser._id });
             res.status(201).json({ message: 'User registered', userId: newUser._id });
         } catch (error) {

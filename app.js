@@ -101,9 +101,19 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Middleware para cargar el usuario y el carrito
 app.use(async (req, res, next) => {
     if (req.session.userId) {
-        const user = await User.findById(req.session.userId).populate('cart');
-        req.user = user;
-        req.cartId = user.cart ? user.cart._id : null;
+        try {
+            const user = await User.findById(req.session.userId).populate('cart');
+            if (!user) {
+                req.cartId = null;
+            } else {
+                req.user = user;
+                req.cartId = user.cart ? user.cart._id : null;
+                req.session.cartId = req.cartId;  // Asegúrate de asignar el cartId a la sesión
+            }
+        } catch (error) {
+            console.error('Error al cargar el usuario y el carrito:', error);
+            req.cartId = null;
+        }
     }
     next();
 });
@@ -141,8 +151,8 @@ app.get('/products', async (req, res) => {
         if (req.session.role === 'admin') {
             user = { role: 'admin' };
         } else if (req.session.userId) {
-            user = await User.findById(req.session.userId).populate('cart');
-            user.cartId = user.cart ? user.cart._id : null;
+            user = await User.findById(req.session.userId);
+            user.cartId = req.session.cartId; // Asignar el ID del carrito al usuario
         }
         res.render('products', {
             products: products.docs,
@@ -160,6 +170,7 @@ app.get('/products', async (req, res) => {
         res.status(500).send(error.message);
     }
 });
+
 app.get('/products/:productId', async (req, res) => {
     try {
         const product = await productManager.getProductById(req.params.productId);

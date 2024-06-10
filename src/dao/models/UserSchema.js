@@ -1,4 +1,3 @@
-// src/dao/models/UserSchema.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 

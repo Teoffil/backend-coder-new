@@ -14,6 +14,7 @@ class CartManager {
         const cart = await Cart.findById(cartId).populate('products.productId');
         return cart;
     }
+    
 
     async addProductToCart(cartId, productId, quantity) {
         const cart = await Cart.findById(cartId);
