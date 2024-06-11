@@ -58,4 +58,12 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error:', error));
     });
+
+    // Configurar el botón "Ver Carrito"
+    const viewCartButton = document.getElementById('view-cart-btn');
+    if (viewCartButton) {
+        viewCartButton.addEventListener('click', function() {
+            location.href = `/api/carts/${cartId}`;
+        });
+    }
 });

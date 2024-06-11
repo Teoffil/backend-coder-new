@@ -29,10 +29,10 @@
             </li>
         {{/each}}
     </ul>
-    {{#if user.cartId}}
-        <a href="/api/carts/{{user.cartId}}">Ver carrito</a>
+    {{#if user}}
+        <button id="view-cart-btn">Ver Carrito</button>
     {{else}}
-        <a href="#">Carrito no disponible</a>
+        <button disabled>Carrito no disponible</button>
     {{/if}}
     {{#if prevPage}}
         <button onclick="location.href='/products?page={{prevPage}}'">Anterior</button>
