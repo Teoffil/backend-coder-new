@@ -17,9 +17,32 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.token) {
-                localStorage.setItem('token', data.token); // Guarda el token en localStorage
-                alert('Login successful');
-                location.href = '/products';
+                localStorage.setItem('token', data.token);
+
+                // Obtener o crear carrito después del login
+                fetch('/api/carts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${data.token}`
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text) });
+                    }
+                    return response.json();
+                })
+                .then(cartData => {
+                    localStorage.setItem('cartId', cartData._id); // Guarda el cartId en localStorage
+                    alert('Login successful');
+                    location.href = '/products';
+                })
+                .catch(error => {
+                    console.error('Error creating cart:', error.message);
+                    alert('Error during cart creation');
+                });
+
             } else {
                 alert('Login failed');
             }

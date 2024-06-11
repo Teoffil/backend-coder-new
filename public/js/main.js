@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const cartId = localStorage.getItem('cartId');
 
+    // Configurar el cartId en todos los botones de "Agregar al Carrito"
     document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-        button.setAttribute('data-cart-id', cartId); // Establecer el cartId en el botón
+        button.setAttribute('data-cart-id', cartId);
 
         button.addEventListener('click', async () => {
             const productId = button.getAttribute('data-product-id');
@@ -33,5 +34,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Error al agregar el producto al carrito.');
             }
         });
+    });
+
+    // Manejar el logout
+    document.getElementById('logout-btn').addEventListener('click', function() {
+        const token = localStorage.getItem('token');
+        fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'Logged out') {
+                alert('Sesión cerrada exitosamente');
+                localStorage.removeItem('token');
+                localStorage.removeItem('cartId');
+                location.href = '/login';
+            } else {
+                alert('Error al cerrar sesión');
+            }
+        })
+        .catch(error => console.error('Error:', error));
     });
 });

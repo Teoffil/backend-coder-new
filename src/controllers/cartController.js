@@ -18,7 +18,7 @@ const ticketDAO = new TicketDAO();
 const cartController = {
     createCart: async (req, res) => {
         try {
-            const userId = req.body.userId;
+            const userId = req.user.id; // Obtener userId del token de usuario si está disponible
             if (!userId) {
                 throw new Error(INVALID_REQUEST.message);
             }
@@ -32,6 +32,7 @@ const cartController = {
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
+    
 
     getCartById: async (req, res) => {
         try {

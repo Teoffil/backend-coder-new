@@ -106,3 +106,5 @@
 {"error":{"expiredAt":"2024-06-09T21:51:59.000Z","message":"jwt expired","name":"TokenExpiredError"},"level":"error","message":"Unauthorized","timestamp":"2024-06-10T11:44:03.158Z"}
 {"error":{"expiredAt":"2024-06-09T21:51:59.000Z","message":"jwt expired","name":"TokenExpiredError"},"level":"error","message":"Unauthorized","timestamp":"2024-06-10T11:44:14.996Z"}
 {"error":{"expiredAt":"2024-06-09T21:51:59.000Z","message":"jwt expired","name":"TokenExpiredError"},"level":"error","message":"Unauthorized","timestamp":"2024-06-10T11:44:27.329Z"}
+{"error":"Cannot read properties of undefined (reading 'message')","level":"error","message":"Error creating cart","timestamp":"2024-06-11T21:53:32.791Z"}
+{"error":"Cannot read properties of undefined (reading 'message')","level":"error","message":"Error creating cart","timestamp":"2024-06-11T21:53:47.175Z"}

@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const cartId = localStorage.getItem('cartId');
+
     document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.setAttribute('data-cart-id', cartId); // Establecer el cartId en el botón
+
         button.addEventListener('click', function() {
             const productId = this.dataset.productId;
-            const cartId = this.dataset.cartId;
 
             if (!cartId) {
                 alert('Carrito no disponible');
@@ -13,8 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify({ productId: productId, quantity: 1 })
+                body: JSON.stringify({ quantity: 1 })
             })
             .then(response => {
                 if (response.ok) {
