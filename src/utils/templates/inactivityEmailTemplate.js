@@ -1,12 +1,12 @@
 module.exports = (email) => {
     return `
         <div>
-            <h1>Account Deleted Due to Inactivity</h1>
-            <p>Dear User,</p>
-            <p>Your account with email ${email} has been deleted due to inactivity.</p>
-            <p>If you have any questions, please contact support.</p>
-            <p>Best regards,</p>
-            <p>Your Company</p>
+            <h1>Cuenta Eliminada por Inactividad</h1>
+            <p>Estimado Usuario,</p>
+            <p>Tu cuenta con el correo electrónico ${email} ha sido eliminada debido a inactividad.</p>
+            <p>Si tienes alguna pregunta, por favor contacta al soporte.</p>
+            <p>Saludos cordiales,</p>
+            <p>BigTecnology</p>
         </div>
     `;
 };

@@ -1,0 +1,235 @@
+/* /public/css/style.css */
+
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header.main-header {
+    background-color: #98d2ff;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header.main-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+header.main-header .main-nav {
+    display: flex;
+    align-items: center;
+}
+
+header.main-header .nav-link {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+    margin-left: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #007BFF;
+    border-radius: 5px;
+}
+
+header.main-header .nav-link:hover {
+    background-color: #0056b3;
+}
+
+header.main-header .cart-link {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+header.main-header .cart-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+}
+
+main {
+    width: 100%;
+    padding: 2rem;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+h1, h2 {
+    margin: 0 0 1rem 0;
+}
+
+/* Estilos específicos para el formulario */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.form-container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+input {
+    width: calc(100% - 1rem);
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    background-color: #007BFF;
+    color: white;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.error-message {
+    color: red;
+    margin-top: 1rem;
+}
+
+/* Github */
+.github-container {
+    margin-top: 1rem;
+}
+
+.github-btn {
+    display: inline-flex;
+    align-items: center;
+    background-color: #333;
+    color: white;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.github-logo {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+}
+
+.github-btn:hover {
+    background-color: #555;
+}
+
+footer {
+    margin-top: auto;
+    padding: 1rem;
+    text-align: center;
+    background-color: #98d2ff;
+    color: #fff;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Estilos específicos para la página de productos */
+.products-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.product-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.product-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 5px;
+    box-sizing: border-box;
+    text-align: center;
+    width: calc(100% - 2rem); /* Una columna para dispositivos móviles */
+}
+
+@media (min-width: 600px) {
+    .product-item {
+        width: calc(50% - 2rem); /* Dos columnas para dispositivos más grandes */
+    }
+}
+
+.product-item h2 {
+    margin: 0 0 0.5rem 0;
+}
+
+.product-item p {
+    margin: 0.5rem 0;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.pagination button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 0 0.5rem;
+}
+
+.pagination button:hover {
+    background-color: #0056b3;
+}

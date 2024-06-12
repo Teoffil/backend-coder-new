@@ -1,25 +1,31 @@
-<!-- purchase.handlebars -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase Confirmation</title>
+    <title>Confirmación de la Compra</title>
 </head>
 <body>
-    <h1>Purchase Confirmation</h1>
+    <h1>Confirmación de la Compra</h1>
     {{#if productsWithInsufficientStock.length}}
-        <p>Some products could not be processed due to insufficient stock:</p>
+        <p>Stock insuficiente en los siguientes productos:</p>
         <ul>
             {{#each productsWithInsufficientStock}}
-                <li>Product ID: {{this}}</li>
+                <li>Producto: {{this.productId.title}} - Cantidad: {{this.quantity}}</li>
             {{/each}}
         </ul>
-        <p>Please review your cart and make the necessary adjustments.</p>
+        <p>Por favor, revise su carrito y haga los ajustes necesarios.</p>
     {{else}}
-        <p>Total Amount: {{totalAmount}}</p>
+        <ul>
+            {{#each cart.products}}
+                <li>
+                    Producto: {{this.productId.title}} - Cantidad: {{this.quantity}}
+                </li>
+            {{/each}}
+        </ul>
+        <p><strong>Monto Total a Pagar: AR$ {{totalAmount}}</strong></p>
         <form id="purchase-form" action="/api/carts/{{cartId}}/confirm-purchase" method="POST">
-            <button type="submit">Confirm Purchase</button>
+            <button type="submit">Confirmar Compra y Pagar Ahora → </button>
         </form>
     {{/if}}
 </body>

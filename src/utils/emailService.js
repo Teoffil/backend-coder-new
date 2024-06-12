@@ -21,79 +21,79 @@ const sendResetEmail = async (to, token) => {
     const mailOptions = {
         from: `"Password Reset" <${config.emailConfig.user}>`,
         to: to,
-        subject: 'Password Reset Request',
-        html: `<p>Click <a href="${resetLink}">here</a> to reset your password. If you did not request this, please ignore this email.</p>`
+        subject: 'Solicitud de restablecimiento de contraseña',
+        html: `<p>Haga clic <a href="${resetLink}">aquí</a> para restablecer su contraseña. Si no solicitó esto, por favor ignore este correo electrónico.</p>`
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log('Password reset email sent successfully');
+        console.log('Correo de restablecimiento de contraseña enviado con éxito');
     } catch (error) {
-        console.error('Error sending password reset email:', error);
+        console.error('Error enviando el correo de restablecimiento de contraseña:', error);
     }
 };
 
 const sendTestEmail = async (to) => {
     const mailOptions = {
-        from: `"Test Email" <${config.emailConfig.user}>`,
+        from: `"Correo de Prueba" <${config.emailConfig.user}>`,
         to: to,
-        subject: 'Test Email',
-        html: '<div><h1>This is a test email!</h1></div>'
+        subject: 'Correo de Prueba',
+        html: '<div><h1>¡Este es un correo de prueba!</h1></div>'
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log('Test email sent successfully');
+        console.log('Correo de prueba enviado con éxito');
     } catch (error) {
-        console.error('Error sending test email:', error);
+        console.error('Error enviando el correo de prueba:', error);
     }
 };
 
 const sendInactivityEmail = async (email) => {
     const mailOptions = {
-        from: `"Inactivity Alert" <${config.emailConfig.user}>`,
+        from: `"Alerta de Inactividad" <${config.emailConfig.user}>`,
         to: email,
-        subject: 'Account Deletion Due to Inactivity',
+        subject: 'Eliminación de cuenta por inactividad',
         html: inactivityEmailTemplate(email)  // Asegúrate de que esto devuelva una cadena
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`Inactivity email sent to ${email}`);
+        console.log(`Correo de inactividad enviado a ${email}`);
     } catch (error) {
-        console.error('Error sending inactivity email:', error);
+        console.error('Error enviando el correo de inactividad:', error);
     }
 };
 
 const sendProductDeletedEmail = async (email) => {
     const mailOptions = {
-        from: `"Product Deleted" <${config.emailConfig.user}>`,
+        from: `"Producto Eliminado" <${config.emailConfig.user}>`,
         to: email,
-        subject: 'Product Deletion Notification',
+        subject: 'Notificación de eliminación de producto',
         html: productDeletedTemplate(email)  // Asegúrate de que esto devuelva una cadena
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`Product deletion email sent to ${email}`);
+        console.log(`Correo de eliminación de producto enviado a ${email}`);
     } catch (error) {
-        console.error('Error sending product deletion email:', error);
+        console.error('Error enviando el correo de eliminación de producto:', error);
     }
 };
 
-const sendTicketEmail = async (email, ticket) => {
+const sendTicketEmail = async (to, ticket, cart) => {
     const mailOptions = {
         from: `"Confirmación de Pedido" <${config.emailConfig.user}>`,
-        to: email,
+        to: to,
         subject: 'Confirmación de su Pedido',
-        html: ticketEmailTemplate(ticket)  // Usar la plantilla de ticket
+        html: ticketEmailTemplate(ticket, cart)  // Usar la plantilla de ticket y pasar el carrito
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`Ticket email sent to ${email}`);
+        console.log(`Correo de ticket enviado a ${to}`);
     } catch (error) {
-        console.error('Error sending ticket email:', error);
+        console.error('Error enviando el correo de ticket:', error);
     }
 };
 

@@ -4,25 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart Details</title>
+    <title>Tu Carrito</title>
 </head>
 <body>
-    <h1>Cart Details</h1>
+    <h1>Tu Carrito</h1>
     {{#if cart.products.length}}
         <ul>
             {{#each cart.products}}
                 <li>
-                    <strong>Product:</strong> {{this.productId.title}}<br>
-                    <strong>Quantity:</strong> {{this.quantity}}<br>
-                    <strong>Price:</strong> {{this.productId.price}}<br>
+                    <strong>Producto:</strong> {{this.productId.title}}<br>
+                    <strong>Cantidad:</strong> {{this.quantity}}<br>
+                    <strong>Precio:</strong> AR$ {{this.productId.price}}<br>
                 </li>
             {{/each}}
         </ul>
         <form action="/api/carts/{{cart._id}}/purchase" method="GET">
-            <button type="submit">Proceed to Purchase</button>
+            <button type="submit">Realizar Compra → </button>
         </form>
     {{else}}
-        <p>Your cart is empty.</p>
+        <p>Tu carrito está vacío.</p>
+        <p>Agrega los productos que más te gusten</p>
     {{/if}}
 </body>
 </html>

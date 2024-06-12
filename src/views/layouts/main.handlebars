@@ -8,10 +8,15 @@
     <link rel="stylesheet" href="/css/style.css"> <!-- Asegúrate de tener este archivo en tu carpeta public/css -->
 </head>
 <body>
-    <header>
-        <h1>Mi Aplicación Web Prueba</h1>
-        <a href="/products" style="display: block; margin: 20px 0; text-align: left;">Volver a Productos</a>
-        <!-- Puedes añadir aquí más elementos de navegación -->
+    <header class="main-header">
+        <h1>BigTecnology</h1>
+        <nav class="main-nav">
+            <a href="/products" class="nav-link">Productos</a>
+            <button id="header-view-cart-btn" class="nav-link cart-link">
+                <img src="/images/others/cart.png" alt="Carrito" class="cart-icon">
+                Carrito
+            </button>
+        </nav>
     </header>
 
     <main>
@@ -23,6 +28,6 @@
     </footer>
 
     <!-- Enlaces a scripts JS -->
-    <script src="/js/script.js"></script> <!-- Asegúrate de tener este archivo en tu carpeta public/js -->
+    <script src="/js/main.js"></script> <!-- Asegúrate de tener este archivo en tu carpeta public/js -->
 </body>
 </html>

@@ -6,40 +6,48 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Productos</h1>
-    {{#if user}}
-        <p>Bienvenido {{user.email}}</p>
-        <p>Rol: {{user.role}}</p>
-        {{#eq user.role 'admin'}}
-            <p>Tienes funciones de administrador: adminCoder@coder.com</p>
-        {{/eq}}
-        <button id="logout-btn">Logout</button>
-    {{else}}
-        <button onclick="location.href='/register'">Registrarse</button>
-        <button onclick="location.href='/login'">Iniciar Sesión</button>
-    {{/if}}
-    <ul>
-        {{#each products}}
-            <li>
-                <h2>{{this.title}}</h2>
-                <p>{{this.description}}</p>
-                <p>Precio: ${{this.price}}</p>
-                <button class="add-to-cart-btn" data-product-id="{{this._id}}" data-cart-id="{{user.cartId}}">Agregar al Carrito</button>
-                <button onclick="location.href='/products/{{this._id}}'">Ver Detalles</button>
-            </li>
-        {{/each}}
-    </ul>
-    {{#if user}}
-        <button id="view-cart-btn">Ver Carrito</button>
-    {{else}}
-        <button disabled>Carrito no disponible</button>
-    {{/if}}
-    {{#if prevPage}}
-        <button onclick="location.href='/products?page={{prevPage}}'">Anterior</button>
-    {{/if}}
-    {{#if nextPage}}
-        <button onclick="location.href='/products?page={{nextPage}}'">Siguiente</button>
-    {{/if}}
+    <header>
+        <h1>Productos</h1>
+        {{#if user}}
+            <p>Bienvenido {{user.email}}</p>
+            <p>Rol: {{user.role}}</p>
+            {{#eq user.role 'admin'}}
+                <p>Tienes funciones de administrador: adminCoder@coder.com</p>
+            {{/eq}}
+            <button id="logout-btn">Cerrar Sesión</button>
+        {{else}}
+            <button onclick="location.href='/register'">Registrarse</button>
+            <button onclick="location.href='/login'">Iniciar Sesión</button>
+        {{/if}}
+    </header>
+    <main>
+        <div class="products-container">
+            <ul class="product-list">
+                {{#each products}}
+                    <li class="product-item">
+                        <h2>{{this.title}}</h2>
+                        <p>{{this.description}}</p>
+                        <p>Precio: ${{this.price}}</p>
+                        <button class="add-to-cart-btn" data-product-id="{{this._id}}" data-cart-id="{{user.cartId}}">Agregar al Carrito</button>
+                        <button onclick="location.href='/products/{{this._id}}'">Ver Detalles</button>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+        {{#if user}}
+            <button id="view-cart-btn">Ver Carrito</button>
+        {{else}}
+            <button disabled>Carrito no disponible</button>
+        {{/if}}
+        <div class="pagination">
+            {{#if prevPage}}
+                <button onclick="location.href='/products?page={{prevPage}}'">Anterior</button>
+            {{/if}}
+            {{#if nextPage}}
+                <button onclick="location.href='/products?page={{nextPage}}'">Siguiente</button>
+            {{/if}}
+        </div>
+    </main>
     <script src="/js/main.js"></script>
 </body>
 </html>

@@ -132,7 +132,7 @@ const cartController = {
             for (const item of cart.products) {
                 const product = await productDAO.getProductById(item.productId);
                 if (item.quantity > product.stock) {
-                    productsWithInsufficientStock.push(product._id);
+                    productsWithInsufficientStock.push(item);
                 }
                 totalAmount += item.quantity * product.price;
             }
@@ -140,7 +140,8 @@ const cartController = {
             res.render('purchase', {
                 cartId: cart._id,
                 totalAmount,
-                productsWithInsufficientStock
+                productsWithInsufficientStock,
+                cart // Añadido para pasar el carrito completo a la vista
             });
         } catch (error) {
             logger.error('Error confirming purchase', { cartId: req.params.cartId, error: error.message });
@@ -154,11 +155,11 @@ const cartController = {
             if (!cart) {
                 throw new Error(CART_NOT_FOUND.message);
             }
-
+    
             let totalAmount = 0;
             const productsWithInsufficientStock = [];
             const updatedCartProducts = [];
-
+    
             for (const item of cart.products) {
                 const product = await productDAO.getProductById(item.productId);
                 if (item.quantity <= product.stock) {
@@ -170,25 +171,25 @@ const cartController = {
                     updatedCartProducts.push(item);
                 }
             }
-
+    
             cart.products = updatedCartProducts;
             await cart.save();
-
+    
             if (productsWithInsufficientStock.length === 0) {
                 const ticket = await ticketDAO.createTicket({
                     amount: totalAmount,
                     purchaser: cart.user
                 });
-
+    
                 // Verificar si el correo electrónico del usuario está disponible
                 const purchaserEmail = cart.user.email;
                 if (!purchaserEmail) {
                     throw new Error('El correo electrónico del comprador no está definido.');
                 }
-
+    
                 // Enviar correo de confirmación del pedido
-                await emailService.sendTicketEmail(purchaserEmail, ticket);
-
+                await emailService.sendTicketEmail(purchaserEmail, ticket, cart);
+    
                 logger.info('Purchase successful', { cartId: req.params.cartId, ticketId: ticket._id });
                 res.redirect(`/ticket/${ticket._id}`);
             } else {
