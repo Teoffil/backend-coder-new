@@ -1,6 +1,8 @@
+// src/utils/emailService.js
 const nodemailer = require('nodemailer');
 const inactivityEmailTemplate = require('./templates/inactivityEmailTemplate');
 const productDeletedTemplate = require('./templates/productDeletedTemplate');
+const ticketEmailTemplate = require('./templates/ticketEmailTemplate');
 const config = require('../../config');  // Importar configuraciones desde config.js
 
 const transporter = nodemailer.createTransport({
@@ -79,9 +81,26 @@ const sendProductDeletedEmail = async (email) => {
     }
 };
 
+const sendTicketEmail = async (email, ticket) => {
+    const mailOptions = {
+        from: `"Confirmación de Pedido" <${config.emailConfig.user}>`,
+        to: email,
+        subject: 'Confirmación de su Pedido',
+        html: ticketEmailTemplate(ticket)  // Usar la plantilla de ticket
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Ticket email sent to ${email}`);
+    } catch (error) {
+        console.error('Error sending ticket email:', error);
+    }
+};
+
 module.exports = {
     sendResetEmail,
     sendTestEmail,
     sendInactivityEmail,
-    sendProductDeletedEmail
+    sendProductDeletedEmail,
+    sendTicketEmail  // Exportar la nueva función
 };

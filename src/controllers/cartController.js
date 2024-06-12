@@ -1,8 +1,11 @@
+// src/controllers/cartController.js
 const CartDAO = require('../dao/mongo/CartDAO');
 const ProductDAO = require('../dao/mongo/ProductDAO');
 const TicketDAO = require('../dao/mongo/TicketDAO');
 const mongoose = require('mongoose');
 const logger = require('../config/logger');
+const emailService = require('../utils/emailService');
+
 const {
     CART_NOT_FOUND,
     INVALID_REQUEST,
@@ -32,7 +35,6 @@ const cartController = {
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
     },
-    
 
     getCartById: async (req, res) => {
         try {
@@ -117,6 +119,35 @@ const cartController = {
         }
     },
 
+    confirmPurchase: async (req, res) => {
+        try {
+            const cart = await cartDAO.getCartById(req.params.cartId);
+            if (!cart) {
+                throw new Error(CART_NOT_FOUND.message);
+            }
+
+            let totalAmount = 0;
+            const productsWithInsufficientStock = [];
+
+            for (const item of cart.products) {
+                const product = await productDAO.getProductById(item.productId);
+                if (item.quantity > product.stock) {
+                    productsWithInsufficientStock.push(product._id);
+                }
+                totalAmount += item.quantity * product.price;
+            }
+
+            res.render('purchase', {
+                cartId: cart._id,
+                totalAmount,
+                productsWithInsufficientStock
+            });
+        } catch (error) {
+            logger.error('Error confirming purchase', { cartId: req.params.cartId, error: error.message });
+            res.status(error.statusCode || 500).send(error.message || INTERNAL_SERVER_ERROR.message);
+        }
+    },
+
     purchaseCart: async (req, res) => {
         try {
             const cart = await cartDAO.getCartById(req.params.cartId);
@@ -149,15 +180,17 @@ const cartController = {
                     purchaser: cart.user
                 });
 
+                // Verificar si el correo electrónico del usuario está disponible
+                const purchaserEmail = cart.user.email;
+                if (!purchaserEmail) {
+                    throw new Error('El correo electrónico del comprador no está definido.');
+                }
+
+                // Enviar correo de confirmación del pedido
+                await emailService.sendTicketEmail(purchaserEmail, ticket);
+
                 logger.info('Purchase successful', { cartId: req.params.cartId, ticketId: ticket._id });
-                res.json({
-                    success: true,
-                    ticketId: ticket._id,
-                    code: ticket.code,
-                    purchaseDatetime: ticket.purchase_datetime,
-                    amount: ticket.amount,
-                    purchaser: ticket.purchaser
-                });
+                res.redirect(`/ticket/${ticket._id}`);
             } else {
                 logger.warn('Purchase failed due to insufficient stock', { cartId: req.params.cartId });
                 res.status(400).json({ success: false, unprocessedItems: productsWithInsufficientStock });
@@ -167,7 +200,7 @@ const cartController = {
             error.statusCode = error.statusCode || 500;
             res.status(error.statusCode).send(error.message || INTERNAL_SERVER_ERROR.message);
         }
-    }
+    },
 };
 
 module.exports = cartController;

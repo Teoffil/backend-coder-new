@@ -1,29 +1,26 @@
-{{! src/views/purchase.handlebars }}
+<!-- purchase.handlebars -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Resultado de la Compra</title>
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Confirmation</title>
 </head>
 <body>
-    <h1>Resultado de la Compra</h1>
-    {{#if purchaseSuccess}}
-    <p>Tu compra ha sido completada exitosamente. Aquí está tu recibo:</p>
-    <ul>
-        <li>ID del Ticket: {{ticketId}}</li>
-        <li>Total Pagado: ${{totalAmount}}</li>
-        <li>Fecha de la Compra: {{purchaseDate}}</li>
-    </ul>
+    <h1>Purchase Confirmation</h1>
+    {{#if productsWithInsufficientStock.length}}
+        <p>Some products could not be processed due to insufficient stock:</p>
+        <ul>
+            {{#each productsWithInsufficientStock}}
+                <li>Product ID: {{this}}</li>
+            {{/each}}
+        </ul>
+        <p>Please review your cart and make the necessary adjustments.</p>
     {{else}}
-    <p>Algunos productos no pudieron ser procesados debido a falta de stock:</p>
-    <ul>
-        {{#each unprocessedItems}}
-        <li>{{this}}</li>
-        {{/each}}
-    </ul>
-    <p>Revisa tu carrito para hacer los ajustes necesarios.</p>
+        <p>Total Amount: {{totalAmount}}</p>
+        <form id="purchase-form" action="/api/carts/{{cartId}}/confirm-purchase" method="POST">
+            <button type="submit">Confirm Purchase</button>
+        </form>
     {{/if}}
-    <a href="/carts/{{cartId}}">Volver al Carrito</a>
-    <a href="/products">Continuar Comprando</a>
 </body>
 </html>

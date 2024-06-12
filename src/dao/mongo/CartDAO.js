@@ -1,3 +1,4 @@
+// src/dao/mongo/CartManager.js
 const Cart = require('../models/CartSchema');
 
 class CartManager {
@@ -11,10 +12,11 @@ class CartManager {
     }
 
     async getCartById(cartId) {
-        const cart = await Cart.findById(cartId).populate('products.productId');
+        const cart = await Cart.findById(cartId)
+            .populate('products.productId')
+            .populate('user');  // Asegúrate de hacer populate del usuario aquí
         return cart;
     }
-    
 
     async addProductToCart(cartId, productId, quantity) {
         const cart = await Cart.findById(cartId);

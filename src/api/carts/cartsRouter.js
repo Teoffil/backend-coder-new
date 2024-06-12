@@ -202,6 +202,7 @@
  *         description: Server error
  */
 
+// src/api/carts/cartsRouter.js
 const express = require('express');
 const cartController = require('../../controllers/cartController');
 const { authorize } = require('../../middleware/authorization');
@@ -213,7 +214,10 @@ router.post('/', cartController.createCart);
 // Listar productos en un carrito específico
 router.get('/:cid', cartController.getCartById);
 
-// Agregar un producto al carrito con autorización de "usuario", "admin" o "premium"
+// Ir a la vista de compra
+router.get('/:cartId/purchase', cartController.confirmPurchase);
+
+// Agregar un producto al carrito
 router.post('/:cartId/products/:productId', authorize(['user', 'admin', 'premium']), cartController.addProductToCart);
 
 // Eliminar un producto específico del carrito
@@ -226,6 +230,7 @@ router.put('/:cartId', cartController.updateCartProducts);
 router.delete('/:cartId', cartController.emptyCart);
 
 // Ruta para finalizar la compra de un carrito
-router.post('/:cartId/purchase', authorize(['user', 'admin', 'premium']), cartController.purchaseCart);
+router.post('/:cartId/confirm-purchase', cartController.purchaseCart);
 
 module.exports = router;
+

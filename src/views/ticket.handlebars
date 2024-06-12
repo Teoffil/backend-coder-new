@@ -1,10 +1,18 @@
-<h1>Ticket de Compra</h1>
-<p>Gracias por su compra, aquí están los detalles de su pedido:</p>
-<ul>
-    {{#each products}}
-    <li>{{quantity}} x {{name}} - ${{totalPrice}}</li>
-    {{/each}}
-</ul>
-<p>Total Pagado: ${{totalAmount}}</p>
-<p>Número de Ticket: {{ticketNumber}}</p>
-<p>Fecha de Compra: {{purchaseDate}}</p>
+<!-- ticket.handlebars -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Ticket</title>
+</head>
+<body>
+    <h1>Purchase Ticket</h1>
+    <p>Thank you for your purchase!</p>
+    <p>Ticket ID: {{ticketId}}</p>
+    <p>Code: {{code}}</p>
+    <p>Purchase Date: {{purchaseDatetime}}</p>
+    <p>Total Amount: {{amount}}</p>
+    <p>Purchaser: {{purchaser}}</p>
+</body>
+</html>

@@ -1,4 +1,4 @@
-// Importación de módulos y librerías
+// app.js
 const express = require('express');
 const exphbs = require('express-handlebars');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
@@ -20,6 +20,7 @@ const authRouter = require('./src/api/auth/authRouter');
 const messageRoutes = require('./src/api/messages/messageRoutes');
 const generalRouter = require('./src/api/generalRouter');
 const usersRouter = require('./src/api/users/usersRouter');
+const ticketRouter = require('./src/api/ticket/ticketRouter'); // Importar el router del ticket
 const ProductDAO = require('./src/dao/mongo/ProductDAO');
 const productManager = new ProductDAO(); // Creando una instancia de ProductDAO
 const User = require('./src/dao/models/UserSchema');
@@ -126,7 +127,10 @@ apiRouter.use('/auth', authRouter);
 apiRouter.use('/messages', messageRoutes);
 apiRouter.use('/test', generalRouter);
 apiRouter.use('/users', usersRouter);
+apiRouter.use('/ticket', ticketRouter); // Usar el router del ticket
 app.use('/api', apiRouter);
+// Configura la ruta del ticket fuera de /api
+app.use('/ticket', ticketRouter); 
 
 // Configuración de las rutas de la aplicación
 app.get('/', (req, res) => {
