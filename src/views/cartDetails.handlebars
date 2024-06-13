@@ -1,30 +1,32 @@
 <!-- cartDetails.handlebars -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tu Carrito</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Tu Carrito</h1>
-    {{#if cart.products.length}}
-        <ul>
-            {{#each cart.products}}
-                <li>
-                    <strong>Producto:</strong> {{this.productId.title}}<br>
-                    <strong>Cantidad:</strong> {{this.quantity}}<br>
-                    <strong>Precio:</strong> AR$ {{this.productId.price}}<br>
-                </li>
-            {{/each}}
-        </ul>
-        <form action="/api/carts/{{cart._id}}/purchase" method="GET">
-            <button type="submit">Realizar Compra → </button>
-        </form>
-    {{else}}
-        <p>Tu carrito está vacío.</p>
-        <p>Agrega los productos que más te gusten</p>
-    {{/if}}
+    <div class="cart-container">
+        <h1>Tu Carrito</h1>
+        {{#if cart.products.length}}
+            <ul class="cart-list">
+                {{#each cart.products}}
+                    <li class="cart-item">
+                        <strong>Producto:</strong> {{this.productId.title}}<br>
+                        <strong>Cantidad:</strong> {{this.quantity}}<br>
+                        <strong>Precio:</strong> AR$ {{this.productId.price}}<br>
+                    </li>
+                {{/each}}
+            </ul>
+            <form action="/api/carts/{{cart._id}}/purchase" method="GET">
+                <button type="submit" class="purchase-btn">Realizar Compra → </button>
+            </form>
+        {{else}}
+            <p>Tu carrito está vacío.</p>
+            <p>Agrega los productos que más te gusten</p>
+        {{/if}}
+    </div>
 </body>
 </html>
-

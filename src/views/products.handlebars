@@ -9,8 +9,8 @@
     <header>
         <h1>Productos</h1>
         {{#if user}}
-            <p>Bienvenido {{user.email}}</p>
-            <p>Rol: {{user.role}}</p>
+            <p><strong>Bienvenido:</strong> {{user.email}}</p>
+            <p><strong>Tu Rol es:</strong> {{user.role}}</p>
             {{#eq user.role 'admin'}}
                 <p>Tienes funciones de administrador: adminCoder@coder.com</p>
             {{/eq}}

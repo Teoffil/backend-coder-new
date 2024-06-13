@@ -115,7 +115,7 @@ button {
     width: 100%;
     background-color: #007BFF;
     color: white;
-    padding: 0.8rem;
+    padding: 0.5rem;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -143,7 +143,7 @@ button:hover {
     align-items: center;
     background-color: #333;
     color: white;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem;
     text-decoration: none;
     border-radius: 5px;
     font-size: 1rem;
@@ -234,74 +234,59 @@ footer {
     background-color: #0056b3;
 }
 
-/* Estilos específicos para el ticket de compra */
-.ticket-container {
+/* Estilos específicos para la página del carrito */
+.cart-container {
+    max-width: 800px;
+    margin: 2rem auto;
     background-color: #fff;
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: 2rem auto;
     text-align: center;
 }
 
-.ticket-container h1 {
+.cart-container h1 {
     color: #007BFF;
     margin-bottom: 1.5rem;
     font-size: 2rem;
 }
 
-.ticket-container h2 {
-    color: #28a745;
-    margin-bottom: 1.5rem;
-    font-size: 1.5rem;
-}
-
-.ticket-container p {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    color: #333;
-}
-
-.ticket-container p.pticket {
-    font-weight: bold;
-    color: #000;
-}
-
-.ticket-container ul {
+.cart-list {
     list-style: none;
     padding: 0;
     margin: 1.5rem 0;
-    text-align: left;
 }
 
-.ticket-container ul li {
+.cart-item {
     background-color: #f9f9f9;
     margin: 0.5rem 0;
-    padding: 0.75rem;
+    padding: 1rem;
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
-    color: #333;
+    text-align: left;
     font-size: 1.1rem;
-}
-
-.ticket-container strong {
-    font-weight: bold;
     color: #333;
 }
 
-.ticket-container a {
-    display: inline-block;
-    margin-top: 1.5rem;
-    padding: 0.75rem 1.5rem;
+.cart-item strong {
+    font-weight: bold;
+    color: #007BFF;
+}
+
+.purchase-btn {
     background-color: #007BFF;
     color: #fff;
-    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border: none;
     border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
     box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+    transition: background-color 0.2s, box-shadow 0.2s;
 }
 
-.ticket-container a:hover {
+.purchase-btn:hover {
     background-color: #0056b3;
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
 }
-
