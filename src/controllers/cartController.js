@@ -155,41 +155,35 @@ const cartController = {
             if (!cart) {
                 throw new Error(CART_NOT_FOUND.message);
             }
-    
+
             let totalAmount = 0;
             const productsWithInsufficientStock = [];
-            const updatedCartProducts = [];
-    
+
             for (const item of cart.products) {
-                const product = await productDAO.getProductById(item.productId);
+                const product = item.productId;
                 if (item.quantity <= product.stock) {
                     totalAmount += item.quantity * product.price;
                     product.stock -= item.quantity;
                     await product.save();
                 } else {
                     productsWithInsufficientStock.push(product._id);
-                    updatedCartProducts.push(item);
                 }
             }
-    
-            cart.products = updatedCartProducts;
-            await cart.save();
-    
+
             if (productsWithInsufficientStock.length === 0) {
                 const ticket = await ticketDAO.createTicket({
                     amount: totalAmount,
-                    purchaser: cart.user
+                    purchaser: cart.user,
+                    cartId: cart._id // Añadir cartId aquí
                 });
-    
-                // Verificar si el correo electrónico del usuario está disponible
+
                 const purchaserEmail = cart.user.email;
                 if (!purchaserEmail) {
                     throw new Error('El correo electrónico del comprador no está definido.');
                 }
-    
-                // Enviar correo de confirmación del pedido
+
                 await emailService.sendTicketEmail(purchaserEmail, ticket, cart);
-    
+
                 logger.info('Purchase successful', { cartId: req.params.cartId, ticketId: ticket._id });
                 res.redirect(`/ticket/${ticket._id}`);
             } else {

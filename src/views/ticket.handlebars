@@ -1,18 +1,27 @@
 <!-- ticket.handlebars -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticket de Compra</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Compra Realizada con Éxito</h1>
-    <p>Gracias por su compra!</p>
-    <p>Estará recibiendo un correo con los pasos para pagar</p>
-    <p>Código de Ticket: {{ticketId}}</p>
-    <p>Fecha de Compra: {{purchaseDatetime}}</p>
-    <p>Total a Pagar: AR$ {{amount}}</p>
-    <p>Purchaser: {{purchaser}}</p>
+    <div class="ticket-container">
+        <h1>Compra Confirmada con Éxito</h1>
+        <p>El Ticket de Compra será guardado por un periodo de 48hs</p>
+        <p>Verifica tu correo donde te llegarán los datos de tu compra</p>
+        <p><strong>Número de Ticket:</strong> {{ticketId}}</p>
+        <p class="pticket"><strong>Total a Pagar:</strong> AR$ {{amount}}</p>
+        <h2>Productos Comprados:</h2>
+        <ul>
+            {{#each products}}
+                <li>{{this.productId.title}} - Cantidad: {{this.quantity}} - Precio: AR$ {{formatPrice this.productId.price}}</li>
+            {{/each}}
+        </ul>
+        <p><strong>→ Para realizar la compra ingrese en este link: www.mercadopago.com</strong></p>
+        <p>Saludos,</p>
+        <p>BigTecnology a su servicio</p>
+    </div>
 </body>
 </html>

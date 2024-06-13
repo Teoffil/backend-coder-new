@@ -19,6 +19,11 @@ const TicketSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    cartId: { // Añadir cartId al esquema del ticket
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Cart',
+        required: true
     }
 });
 

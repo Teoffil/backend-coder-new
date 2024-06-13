@@ -1,4 +1,3 @@
-// app.js
 const express = require('express');
 const exphbs = require('express-handlebars');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
@@ -27,26 +26,32 @@ const User = require('./src/dao/models/UserSchema');
 const Cart = require('./src/dao/models/CartSchema');
 const { port } = require('./config');
 const errorHandler = require('./src/middleware/errorHandler');
+const Handlebars = require('handlebars');
 
-// Creación de una nueva instancia de Handlebars y configuración de helpers
-const Handlebars = exphbs.create({
-    handlebars: allowInsecurePrototypeAccess(require('handlebars'))
-});
-
-// Registro de helpers 'eq', 'multiply' y 'totalPrice'
-Handlebars.handlebars.registerHelper('eq', function(arg1, arg2, options) {
-    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
-});
-Handlebars.handlebars.registerHelper('multiply', function(value1, value2) {
-    return value1 * value2;
-});
-Handlebars.handlebars.registerHelper('totalPrice', function(products) {
-    return products.reduce((total, product) => {
-        return total + (product.productId.price * product.quantity);
-    }, 0);
-});
-Handlebars.handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
-    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+// Configuración de Handlebars con helpers
+const hbs = exphbs.create({
+    defaultLayout: 'main',
+    extname: '.handlebars',
+    handlebars: allowInsecurePrototypeAccess(Handlebars),
+    helpers: {
+        formatPrice: function(price) {
+            return price.toFixed(2);
+        },
+        eq: function(arg1, arg2, options) {
+            return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+        },
+        multiply: function(value1, value2) {
+            return value1 * value2;
+        },
+        totalPrice: function(products) {
+            return products.reduce((total, product) => {
+                return total + (product.productId.price * product.quantity);
+            }, 0);
+        },
+        ifEquals: function(arg1, arg2, options) {
+            return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+        }
+    }
 });
 
 // Configuración de la base de datos
@@ -78,8 +83,8 @@ app.use(passport.session());
 app.use(flash());
 
 // Configuración de Handlebars como motor de plantillas
-app.engine('handlebars', exphbs.engine({ handlebars: Handlebars.handlebars }));
-app.set('view engine', 'handlebars');
+app.engine('.handlebars', hbs.engine);
+app.set('view engine', '.handlebars');
 app.set('views', './src/views');
 
 // Configuración del middleware para parsear JSON y cookies
@@ -129,6 +134,7 @@ apiRouter.use('/test', generalRouter);
 apiRouter.use('/users', usersRouter);
 apiRouter.use('/ticket', ticketRouter); // Usar el router del ticket
 app.use('/api', apiRouter);
+
 // Configura la ruta del ticket fuera de /api
 app.use('/ticket', ticketRouter); 
 

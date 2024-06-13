@@ -45,27 +45,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // Manejar el logout
     const logoutButton = document.getElementById('logout-btn');
     if (logoutButton) {
-        logoutButton.addEventListener('click', function() {
-            const token = localStorage.getItem('token');
-            fetch('/api/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message === 'Logged out') {
-                    alert('Sesión cerrada exitosamente');
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('cartId');
-                    location.href = '/login';
-                } else {
-                    alert('Error al cerrar sesión');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
+        // Verificar si el evento ya ha sido añadido
+        if (!logoutButton.dataset.eventAdded) {
+            logoutButton.addEventListener('click', function() {
+                const token = localStorage.getItem('token');
+                fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Logged out') {
+                        alert('Sesión cerrada exitosamente');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('cartId');
+                        location.href = '/login';
+                    } else {
+                        alert('Error al cerrar sesión');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+
+            // Marcar que el evento ha sido añadido
+            logoutButton.dataset.eventAdded = true;
+        }
     }
 
     // Configurar el botón "Ver Carrito" en la página de productos

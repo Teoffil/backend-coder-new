@@ -7,7 +7,7 @@ class TicketDAO {
     }
 
     async getTicketById(ticketId) {
-        return await Ticket.findById(ticketId).populate('purchaser');
+        return await Ticket.findById(ticketId).populate('purchaser').populate('cartId'); // Asegúrate de hacer populate del carrito
     }
 }
 
