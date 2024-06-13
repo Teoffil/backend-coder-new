@@ -12,6 +12,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/config/swaggerConfig');
 const path = require('path'); // Importar path
 
+
 // Importación de routers y modelos
 const productsRouter = require('./src/api/products/productsRouter');
 const cartsRouter = require('./src/api/carts/cartsRouter');
@@ -24,7 +25,7 @@ const ProductDAO = require('./src/dao/mongo/ProductDAO');
 const productManager = new ProductDAO(); // Creando una instancia de ProductDAO
 const User = require('./src/dao/models/UserSchema');
 const Cart = require('./src/dao/models/CartSchema');
-const { port } = require('./config');
+const { adminEmail, port } = require('./config');
 const errorHandler = require('./src/middleware/errorHandler');
 const Handlebars = require('handlebars');
 
@@ -108,13 +109,19 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(async (req, res, next) => {
     if (req.session.userId) {
         try {
-            const user = await User.findById(req.session.userId).populate('cart');
-            if (!user) {
-                req.cartId = null;
+            if (req.session.userId === 'admin') {
+                // Manejo especial para el usuario administrador
+                req.user = { _id: 'admin', email: adminEmail, role: 'admin' };
+                req.cartId = null; // El administrador no tiene un carrito
             } else {
-                req.user = user;
-                req.cartId = user.cart ? user.cart._id : null;
-                req.session.cartId = req.cartId;  // Asegúrate de asignar el cartId a la sesión
+                const user = await User.findById(req.session.userId).populate('cart');
+                if (!user) {
+                    req.cartId = null;
+                } else {
+                    req.user = user;
+                    req.cartId = user.cart ? user.cart._id : null;
+                    req.session.cartId = req.cartId;  // Asegúrate de asignar el cartId a la sesión
+                }
             }
         } catch (error) {
             console.error('Error al cargar el usuario y el carrito:', error);

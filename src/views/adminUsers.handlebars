@@ -3,40 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin - Manage Users</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Manage Users</h1>
-    <a href="/products">Volver a Productos</a>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each users}}
+    <div class="admin-users-container">
+        <h1>Administrador de Usuarios</h1>
+        <table class="admin-users-table">
+            <thead>
                 <tr>
-                    <td>{{this._id}}</td>
-                    <td>{{this.first_name}} {{this.last_name}}</td>
-                    <td>{{this.email}}</td>
-                    <td>{{this.role}}</td>
-                    <td>
-                        <button class="edit-user" data-user-id="{{this._id}}">Edit</button>
-                        <button class="delete-user" data-user-id="{{this._id}}">Delete</button>
-                    </td>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
                 </tr>
-            {{else}}
-                <tr>
-                    <td colspan="5">No users found.</td>
-                </tr>
-            {{/each}}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {{#each users}}
+                    <tr>
+                        <td>{{this._id}}</td>
+                        <td>{{this.first_name}} {{this.last_name}}</td>
+                        <td>{{this.email}}</td>
+                        <td>{{this.role}}</td>
+                        <td>
+                            <button class="edit-user" data-user-id="{{this._id}}">Edit</button>
+                            <button class="delete-user" data-user-id="{{this._id}}">Delete</button>
+                        </td>
+                    </tr>
+                {{else}}
+                    <tr>
+                        <td colspan="5">No users found.</td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
     <script src="/js/adminUsers.js"></script>
 </body>
 </html>
