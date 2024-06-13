@@ -147,7 +147,7 @@ app.use('/ticket', ticketRouter);
 
 // Configuración de las rutas de la aplicación
 app.get('/', (req, res) => {
-    res.render('home');
+    res.redirect('/products');
 });
 app.get('/chat', (req, res) => {
     res.render('chat');
