@@ -19,37 +19,39 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.token) {
                 localStorage.setItem('token', data.token);
 
-                // Obtener o crear carrito después del login
-                fetch('/api/carts', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${data.token}`
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => { throw new Error(text) });
-                    }
-                    return response.json();
-                })
-                .then(cartData => {
-                    localStorage.setItem('cartId', cartData._id); // Guarda el cartId en localStorage
-                    alert('Login successful');
+                if (data.userId === 'admin') {
                     location.href = '/products';
-                })
-                .catch(error => {
-                    console.error('Error creating cart:', error.message);
-                    alert('Error during cart creation');
-                });
-
+                } else {
+                    fetch('/api/carts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${data.token}`
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => { throw new Error(text) });
+                        }
+                        return response.json();
+                    })
+                    .then(cartData => {
+                        localStorage.setItem('cartId', cartData._id);
+                        location.href = '/products';
+                    })
+                    .catch(error => {
+                        console.error('Error creating cart:', error.message);
+                        location.href = '/products'; // Redirigir incluso si hay un error en la creación del carrito
+                    });
+                }
             } else {
-                alert('Login failed');
+                console.error('Login failed');
+                location.href = '/login'; // Redirigir al login si el login falla
             }
         })
         .catch(error => {
             console.error('Error during login:', error);
-            alert('An error occurred during login');
+            location.href = '/login'; // Redirigir al login si hay un error
         });
     });
 });

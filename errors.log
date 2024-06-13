@@ -143,3 +143,10 @@
 {"cid":"666a50698f5eabc6a5b4e2ee","error":"Cart not found.","level":"error","message":"Error retrieving cart","timestamp":"2024-06-13T02:04:16.012Z"}
 {"error":"Cannot read properties of undefined (reading 'id')","level":"error","message":"Error creating cart","timestamp":"2024-06-13T02:07:57.762Z"}
 {"error":"Cannot read properties of undefined (reading 'id')","level":"error","message":"Error creating cart","timestamp":"2024-06-13T02:08:01.379Z"}
+{"error":"Cast to ObjectId failed for value \"adminCart\" (type string) at path \"_id\" for model \"Cart\"","level":"error","message":"Login error","timestamp":"2024-06-13T02:33:51.196Z"}
+{"error":"Cast to ObjectId failed for value \"adminCart\" (type string) at path \"_id\" for model \"Cart\"","level":"error","message":"Login error","timestamp":"2024-06-13T02:36:05.929Z"}
+{"error":"Cast to ObjectId failed for value \"adminCart\" (type string) at path \"_id\" for model \"Cart\"","level":"error","message":"Login error","timestamp":"2024-06-13T02:36:17.286Z"}
+{"error":"Cannot read properties of undefined (reading 'id')","level":"error","message":"Error creating cart","timestamp":"2024-06-13T02:37:09.814Z"}
+{"error":"Cannot read properties of undefined (reading 'id')","level":"error","message":"Error creating cart","timestamp":"2024-06-13T02:40:28.790Z"}
+{"error":"Cannot read properties of undefined (reading 'id')","level":"error","message":"Error creating cart","timestamp":"2024-06-13T02:42:04.784Z"}
+{"error":"Cannot read properties of undefined (reading 'id')","level":"error","message":"Error creating cart","timestamp":"2024-06-13T02:43:25.313Z"}
