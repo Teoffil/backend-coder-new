@@ -1,6 +1,5 @@
-<!-- cartDetails.handlebars -->
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,25 +7,25 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div class="cart-container">
-        <h1>Tu Carrito</h1>
-        {{#if cart.products.length}}
-            <ul class="cart-list">
-                {{#each cart.products}}
-                    <li class="cart-item">
-                        <strong>Producto:</strong> {{this.productId.title}}<br>
-                        <strong>Cantidad:</strong> {{this.quantity}}<br>
-                        <strong>Precio:</strong> AR$ {{this.productId.price}}<br>
-                    </li>
-                {{/each}}
-            </ul>
-            <form action="/api/carts/{{cart._id}}/purchase" method="GET">
-                <button type="submit" class="purchase-btn">Realizar Compra → </button>
-            </form>
-        {{else}}
-            <p>Tu carrito está vacío.</p>
-            <p>Agrega los productos que más te gusten</p>
-        {{/if}}
-    </div>
+    <h1>Tu Carrito</h1>
+    {{#if cart.products.length}}
+        <ul class="cart-products">
+            {{#each cart.products}}
+                <li class="cart-product-item">
+                    <span><strong>Producto:</strong> {{this.productId.title}}</span>
+                    <span><strong>Cantidad:</strong> {{this.quantity}}</span>
+                    <span><strong>Precio:</strong> AR$ {{this.productId.price}}</span>
+                    <button class="remove-product-btn" data-product-id="{{this.productId._id}}" data-cart-id="{{../cart._id}}">X</button>
+                </li>
+            {{/each}}
+        </ul>
+        <form action="/api/carts/{{cart._id}}/purchase" method="GET">
+            <button class="purchase-btn" type="submit">Realizar Compra → </button>
+        </form>
+    {{else}}
+        <p>Tu carrito está vacío.</p>
+        <p>Agrega los productos que más te gusten</p>
+    {{/if}}
+    <script src="/js/cart.js"></script>
 </body>
 </html>

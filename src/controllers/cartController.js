@@ -1,4 +1,3 @@
-// src/controllers/cartController.js
 const CartDAO = require('../dao/mongo/CartDAO');
 const ProductDAO = require('../dao/mongo/ProductDAO');
 const TicketDAO = require('../dao/mongo/TicketDAO');
@@ -21,7 +20,7 @@ const ticketDAO = new TicketDAO();
 const cartController = {
     createCart: async (req, res) => {
         try {
-            const userId = req.user.id; // Obtener userId del token de usuario si está disponible
+            const userId = req.user.id;
             if (!userId) {
                 throw new Error(INVALID_REQUEST.message);
             }
@@ -47,7 +46,7 @@ const cartController = {
                 throw new Error(CART_NOT_FOUND.message);
             }
             logger.info('Cart retrieved successfully', { cid });
-            res.render('cartDetails', { cart }); // Renderiza la vista cartDetails.handlebars con los datos del carrito
+            res.render('cartDetails', { cart });
         } catch (error) {
             logger.error('Error retrieving cart', { cid: req.params.cid, error: error.message });
             error.statusCode = error.statusCode || 500;
@@ -141,7 +140,7 @@ const cartController = {
                 cartId: cart._id,
                 totalAmount,
                 productsWithInsufficientStock,
-                cart // Añadido para pasar el carrito completo a la vista
+                cart
             });
         } catch (error) {
             logger.error('Error confirming purchase', { cartId: req.params.cartId, error: error.message });
@@ -174,7 +173,7 @@ const cartController = {
                 const ticket = await ticketDAO.createTicket({
                     amount: totalAmount,
                     purchaser: cart.user,
-                    cartId: cart._id // Añadir cartId aquí
+                    cartId: cart._id
                 });
 
                 const purchaserEmail = cart.user.email;

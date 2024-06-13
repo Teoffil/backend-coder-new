@@ -139,3 +139,7 @@
 {"cid":"666a439650fa42c446edef38","error":"Cart not found.","level":"error","message":"Error retrieving cart","timestamp":"2024-06-13T01:07:26.565Z"}
 {"cid":"666a439650fa42c446edef38","error":"Cart not found.","level":"error","message":"Error retrieving cart","timestamp":"2024-06-13T01:07:27.826Z"}
 {"cartId":"666a4676a5ebe1a60a5a82bc","error":"Cart not found.","level":"error","message":"Error confirming purchase","timestamp":"2024-06-13T01:19:09.884Z"}
+{"cid":"666a50698f5eabc6a5b4e2ee","error":"Cart not found.","level":"error","message":"Error retrieving cart","timestamp":"2024-06-13T02:02:11.491Z"}
+{"cid":"666a50698f5eabc6a5b4e2ee","error":"Cart not found.","level":"error","message":"Error retrieving cart","timestamp":"2024-06-13T02:04:16.012Z"}
+{"error":"Cannot read properties of undefined (reading 'id')","level":"error","message":"Error creating cart","timestamp":"2024-06-13T02:07:57.762Z"}
+{"error":"Cannot read properties of undefined (reading 'id')","level":"error","message":"Error creating cart","timestamp":"2024-06-13T02:08:01.379Z"}
