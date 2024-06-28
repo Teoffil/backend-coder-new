@@ -128,7 +128,8 @@ const authController = {
                 logger.warn('Registration attempt failed - duplicate email', { email });
                 const error = new Error(DUPLICATE_USER.message);
                 error.statusCode = DUPLICATE_USER.statusCode;
-                throw error;
+                req.flash('error', 'Email already registered.');
+                return res.redirect('/register');
             }
     
             const newUser = await userDAO.createUser({
@@ -141,27 +142,26 @@ const authController = {
             });
             if (!newUser) {
                 logger.error('Failed to create a new user');
-                throw new Error(INTERNAL_SERVER_ERROR.message);
+                req.flash('error', 'Failed to create a new user.');
+                return res.redirect('/register');
             }
     
             const newCart = await cartDAO.createCart(newUser._id);
             if (!newCart) {
                 logger.error('Failed to create a cart for new user');
-                throw new Error(INTERNAL_SERVER_ERROR.message);
+                req.flash('error', 'Failed to create a cart for new user.');
+                return res.redirect('/register');
             }
     
             newUser.cart = newCart._id;
             await newUser.save();
     
-            req.session.userId = newUser._id;
-            req.session.role = newUser.role;
-            req.session.cartId = newUser.cart;
-    
             logger.info('User registered successfully', { userId: newUser._id });
-            res.status(201).json({ message: 'User registered', userId: newUser._id });
+            res.redirect('/register?success=true');
         } catch (error) {
             logger.error('Registration error', { error: error.message });
-            res.status(error.statusCode || 500).send(error.message || INTERNAL_SERVER_ERROR.message);
+            req.flash('error', error.message || INTERNAL_SERVER_ERROR.message);
+            res.redirect('/register');
         }
     },
 

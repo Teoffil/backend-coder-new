@@ -3,10 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Registro</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('success')) {
+                alert('Usuario Registrado Exitosamente, Ingresa Nuevamente con tus Credenciales');
+                window.location.href = '/login';
+            }
+        });
+    </script>
 </head>
 <body>
     <h1>Registro</h1>
-        <form action="/api/auth/register" method="POST">
+    {{#if error}}
+    <div style="color: red;">{{error}}</div>
+    {{/if}}
+    <form action="/api/auth/register" method="POST">
         <label for="first_name">Nombre:</label>
         <input type="text" id="first_name" name="first_name" required>
         <label for="last_name">Apellido:</label>
@@ -19,8 +31,5 @@
         <input type="password" id="password" name="password" required>
         <button type="submit">Registrarse</button>
     </form>
-    {{#if error}}
-    <div style="color: red;">{{error}}</div>
-    {{/if}}
 </body>
 </html>
